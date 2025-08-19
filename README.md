@@ -1,48 +1,62 @@
 
 # TypeScript
 
-[![CI](https://github.com/microsoft/TypeScript/actions/workflows/ci.yml/badge.svg)](https://github.com/microsoft/TypeScript/actions/workflows/ci.yml)
-[![npm version](https://badge.fury.io/js/typescript.svg)](https://www.npmjs.com/package/typescript)
-[![Downloads](https://img.shields.io/npm/dm/typescript.svg)](https://www.npmjs.com/package/typescript)
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/microsoft/TypeScript/badge)](https://securityscorecards.dev/viewer/?uri=github.com/microsoft/TypeScript)
+## Features
 
+- ✅ Cross-platform compatibility (iOS, Android, Web)
+- ✅ TypeScript support for type safety
+- ✅ Modern React Native navigation
+- ✅ Beautiful UI with phosphor icons
+- ✅ Expo managed workflow for easy development
 
-[TypeScript](https://www.typescriptlang.org/) is a language for application-scale JavaScript. TypeScript adds optional types to JavaScript that support tools for large-scale JavaScript applications for any browser, for any host, on any OS. TypeScript compiles to readable, standards-based JavaScript. Try it out at the [playground](https://www.typescriptlang.org/play/), and stay up to date via [our blog](https://blogs.msdn.microsoft.com/typescript) and [Twitter account](https://twitter.com/typescript).
+## Prerequisites
 
-Find others who are using TypeScript at [our community page](https://www.typescriptlang.org/community/).
+Before running this application, make sure you have the following installed:
 
-## Installing
+- Node.js (version 14.17 or higher)
+- npm or yarn package manager
+- Expo CLI (optional, but recommended)
 
-For the latest stable version:
+## Installation
 
+1. Clone the repository:
 ```bash
-npm install -D typescript
+git clone <repository-url>
+cd MobileApp
 ```
 
-For our nightly builds:
-
+2. Install dependencies:
 ```bash
-npm install -D typescript@next
+npm install
 ```
 
-## Contribute
+3. Install Expo CLI globally (if not already installed):
+```bash
+npm install -g @expo/cli
+```
 
-There are many ways to [contribute](https://github.com/microsoft/TypeScript/blob/main/CONTRIBUTING.md) to TypeScript.
-* [Submit bugs](https://github.com/microsoft/TypeScript/issues) and help us verify fixes as they are checked in.
-* Review the [source code changes](https://github.com/microsoft/TypeScript/pulls).
-* Engage with other TypeScript users and developers on [StackOverflow](https://stackoverflow.com/questions/tagged/typescript).
-* Help each other in the [TypeScript Community Discord](https://discord.gg/typescript).
-* Join the [#typescript](https://twitter.com/search?q=%23TypeScript) discussion on Twitter.
-* [Contribute bug fixes](https://github.com/microsoft/TypeScript/blob/main/CONTRIBUTING.md).
+## Running the Application
 
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see
-the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com)
-with any additional questions or comments.
+### Web Development
+```bash
+npm run web
+# or
+npx expo start --web
+```
 
-## Documentation
+### iOS Simulator
+```bash
+npm run ios
+# or
+npx expo start --ios
+```
 
-*  [TypeScript in 5 minutes](https://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes.html)
-*  [Programming handbook](https://www.typescriptlang.org/docs/handbook/intro.html)
+### Android Emulator
+```bash
+npm run android
+# or
+npx expo start --android
+```
 *  [Homepage](https://www.typescriptlang.org/)
 
 ## Roadmap
