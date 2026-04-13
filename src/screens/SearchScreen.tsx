@@ -1,0 +1,210 @@
+import React, { useState } from 'react';
+import {
+  View,
+  StyleSheet,
+  SafeAreaView,
+  TouchableOpacity,
+  Text,
+} from 'react-native';
+import { List } from 'phosphor-react-native';
+import { useTheme } from '../contexts/ThemeContext';
+import { useLanguage } from '../contexts/LanguageContext';
+import { SearchBar } from '../components/SearchBar';
+import { SearchResults } from '../components/SearchResults';
+import { searchService, SearchResult, SearchOptions } from '../services/searchService';
+import { Verse } from '../types';
+
+interface SearchScreenProps {
+  onBack: () => void;
+  onVerseSelect: (verse: Verse) => void;
+  onOpenDrawer: () => void;
+}
+
+export const SearchScreen: React.FC<SearchScreenProps> = ({
+  onBack,
+  onVerseSelect,
+  onOpenDrawer
+}) => {
+  const { colors } = useTheme();
+  const { t } = useLanguage();
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [currentSearchTerm, setCurrentSearchTerm] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
+
+  const handleSearch = async (searchTerm: string, options: SearchOptions) => {
+    setIsSearching(true);
+    setCurrentSearchTerm(searchTerm);
+    
+    try {
+      // Add small delay to show loading state
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      const results = searchService.searchVerses(searchTerm, options);
+      setSearchResults(results);
+      setHasSearched(true);
+    } catch (error) {
+      console.error('Search error:', error);
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleClear = () => {
+    setSearchResults([]);
+    setCurrentSearchTerm('');
+    setHasSearched(false);
+  };
+
+  const renderContent = () => {
+    if (!hasSearched && !isSearching) {
+      return (
+        <View style={styles.welcomeContainer}>
+          <Text style={[styles.welcomeTitle, { color: colors.spiritual }]}>
+            {t.search.searchTitle}
+          </Text>
+          <Text style={[styles.welcomeSubtitle, { color: colors.text }]}>
+            {t.search.searchSubtitle}
+          </Text>
+          
+          <View style={styles.searchTips}>
+            <Text style={[styles.tipsTitle, { color: colors.text }]}>{t.search.tips}</Text>
+            <Text style={[styles.tipItem, { color: colors.textSecondary }]}>
+              {t.search.tip1}
+            </Text>
+            <Text style={[styles.tipItem, { color: colors.textSecondary }]}>
+              {t.search.tip2}
+            </Text>
+            <Text style={[styles.tipItem, { color: colors.textSecondary }]}>
+              {t.search.tip3}
+            </Text>
+            <Text style={[styles.tipItem, { color: colors.textSecondary }]}>
+              {t.search.tip4}
+            </Text>
+          </View>
+        </View>
+      );
+    }
+
+    return (
+      <SearchResults
+        results={searchResults}
+        onVerseSelect={onVerseSelect}
+        searchTerm={currentSearchTerm}
+        loading={isSearching}
+      />
+    );
+  };
+
+  return (
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={[styles.backButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
+          onPress={onBack}
+        >
+          <Text style={[styles.backButtonText, { color: colors.spiritual }]}>{t.navigation.back}</Text>
+        </TouchableOpacity>
+        
+        <Text style={[styles.headerTitle, { color: colors.text }]}>{t.search.title}</Text>
+        
+        <TouchableOpacity
+          style={[styles.menuButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
+          onPress={onOpenDrawer}
+        >
+          <List size={20} color={colors.spiritual} weight="bold" />
+        </TouchableOpacity>
+      </View>
+
+      {/* Search Bar */}
+      <View style={styles.searchContainer}>
+        <SearchBar
+          onSearch={handleSearch}
+          onClear={handleClear}
+          placeholder={t.search.placeholder}
+          showAdvancedOptions={true}
+        />
+      </View>
+
+      {/* Content */}
+      <View style={styles.contentContainer}>
+        {renderContent()}
+      </View>
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    gap: 16,
+  },
+  backButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+  },
+  backButtonText: {
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    flex: 1,
+  },
+  menuButton: {
+    padding: 8,
+    borderRadius: 10,
+    borderWidth: 1,
+  },
+  searchContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: 16,
+  },
+  contentContainer: {
+    flex: 1,
+    paddingHorizontal: 20,
+  },
+  welcomeContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  welcomeTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  welcomeSubtitle: {
+    fontSize: 16,
+    textAlign: 'center',
+    lineHeight: 24,
+    marginBottom: 32,
+  },
+  searchTips: {
+    width: '100%',
+    maxWidth: 300,
+  },
+  tipsTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 12,
+  },
+  tipItem: {
+    fontSize: 14,
+    lineHeight: 20,
+    marginBottom: 8,
+  },
+});

@@ -7,30 +7,35 @@ import {
   ScrollView,
   SafeAreaView 
 } from 'react-native';
+import { List } from 'phosphor-react-native';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { dataService } from '../services/dataService';
 import { Verse, Language } from '../types';
 import { useFontSize } from '../contexts/FontSizeContext';
-import { FontSizeControls } from '../components/FontSizeControls';
+import { useTheme } from '../contexts/ThemeContext';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface VerseDetailScreenProps {
   verse: Verse;
   onBack: () => void;
   onVerseChange?: (verse: Verse) => void;
+  onOpenDrawer: () => void;
 }
 
 export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({ 
   verse, 
   onBack, 
-  onVerseChange 
+  onVerseChange,
+  onOpenDrawer 
 }) => {
   const [currentVerse, setCurrentVerse] = useState<Verse>(verse);
   const [selectedLanguage, setSelectedLanguage] = useState<Language>('sanskrit');
   const [isBookmarked, setIsBookmarked] = useState(false);
-  const [showFontControls, setShowFontControls] = useState(false);
   
-  // Use font size context
+  // Use font size context and theme
   const { fontSizes } = useFontSize();
+  const { colors } = useTheme();
+  const { t } = useLanguage();
 
   const totalVerses = dataService.getTotalVerses();
   const canGoPrevious = currentVerse.verse_number! > 1;
@@ -140,28 +145,27 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={onBack}>
-          <Text style={styles.backButtonText}>← Back</Text>
+      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+        <TouchableOpacity style={[styles.backButton, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={onBack}>
+          <Text style={[styles.backButtonText, { color: colors.spiritual }]}>{t.navigation.back}</Text>
         </TouchableOpacity>
         
         <View style={styles.headerCenter}>
-          <Text style={styles.verseTitle}>Verse {currentVerse.verse_number}</Text>
-          <Text style={styles.pageInfo}>Page {currentVerse.page_number}</Text>
+          <Text style={[styles.verseTitle, { color: colors.spiritual }]}>{t.verseDetail.verse} {currentVerse.verse_number}</Text>
+          <Text style={[styles.pageInfo, { color: colors.textSecondary }]}>{t.verseDetail.page} {currentVerse.page_number}</Text>
         </View>
         
         <View style={styles.headerRight}>
-          <TouchableOpacity 
-            style={styles.fontSizeButton} 
-            onPress={() => setShowFontControls(!showFontControls)}
-          >
-            <Text style={styles.fontSizeButtonText}>Aa</Text>
+          <TouchableOpacity style={[styles.bookmarkButton, { backgroundColor: colors.accent }]} onPress={toggleBookmark}>
+            <Text style={[styles.bookmarkText, { color: colors.spiritual }]}>{isBookmarked ? '★' : '☆'}</Text>
           </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.bookmarkButton} onPress={toggleBookmark}>
-            <Text style={styles.bookmarkText}>{isBookmarked ? '★' : '☆'}</Text>
+          <TouchableOpacity 
+            style={[styles.menuButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
+            onPress={onOpenDrawer}
+          >
+            <List size={20} color={colors.spiritual} weight="bold" />
           </TouchableOpacity>
         </View>
       </View>
@@ -174,44 +178,39 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
               key={lang}
               style={[
                 styles.languageButton,
-                selectedLanguage === lang && styles.activeLanguageButton
+                { backgroundColor: selectedLanguage === lang ? colors.spiritual : colors.surface, borderColor: colors.border },
+                selectedLanguage === lang && { backgroundColor: colors.spiritual }
               ]}
               onPress={() => setSelectedLanguage(lang)}
             >
               <Text style={[
                 styles.languageButtonText,
-                selectedLanguage === lang && styles.activeLanguageButtonText
+                { color: selectedLanguage === lang ? colors.buttonText : colors.textSecondary },
+                selectedLanguage === lang && { color: colors.buttonText }
               ]}>
-                {lang.charAt(0).toUpperCase() + lang.slice(1)}
+                {t.verseDetail[lang as keyof typeof t.verseDetail]}
               </Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
       </View>
 
-      {/* Font Size Controls */}
-      {showFontControls && (
-        <View style={styles.fontControlsContainer}>
-          <FontSizeControls style={styles.fontControls} />
-        </View>
-      )}
-
       {/* Verse Content */}
       <PanGestureHandler onGestureEvent={onSwipeGesture}>
-        <ScrollView style={styles.contentContainer} showsVerticalScrollIndicator={false}>
-        <View style={styles.verseContent}>
+        <ScrollView style={[styles.contentContainer, { backgroundColor: colors.background }]} showsVerticalScrollIndicator={false}>
+        <View style={[styles.verseContent, { backgroundColor: colors.surface }]}>
           {selectedLanguage === 'sanskrit' ? (
             // Handle Sanskrit text with line breaks
             <View>
               {getDisplayText().split('\n').map((line, index) => (
-                <Text key={index} style={getTextStyle()}>
+                <Text key={index} style={[getTextStyle(), { color: colors.text }]}>
                   {line}
                 </Text>
               ))}
             </View>
           ) : (
             // Regular text for other languages
-            <Text style={getTextStyle()}>
+            <Text style={[getTextStyle(), { color: colors.text }]}>
               {getDisplayText()}
             </Text>
           )}
@@ -221,7 +220,7 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
         {selectedLanguage === 'sanskrit' && (
           <View style={styles.translationsContainer}>
             <View style={styles.translationSection}>
-              <Text style={[styles.translationLabel, { fontSize: fontSizes.labels }]}>Transliteration:</Text>
+              <Text style={[styles.translationLabel, { fontSize: fontSizes.labels, color: colors.spiritual }]}>Transliteration:</Text>
               <View>
                 {currentVerse.transliteration.split('\n').map((line, index) => (
                   <Text 
@@ -230,7 +229,8 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
                       styles.transliterationText, 
                       { 
                         fontSize: fontSizes.transliteration,
-                        lineHeight: fontSizes.transliteration * 1.5
+                        lineHeight: fontSizes.transliteration * 1.5,
+                        color: colors.text
                       }
                     ]}
                   >
@@ -241,13 +241,14 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
             </View>
             
             <View style={styles.translationSection}>
-              <Text style={[styles.translationLabel, { fontSize: fontSizes.labels }]}>Hindi Meaning:</Text>
+              <Text style={[styles.translationLabel, { fontSize: fontSizes.labels, color: colors.spiritual }]}>Hindi Meaning:</Text>
               <Text 
                 style={[
                   styles.hindiText, 
                   { 
                     fontSize: fontSizes.hindi,
-                    lineHeight: fontSizes.hindi * 1.5
+                    lineHeight: fontSizes.hindi * 1.5,
+                    color: colors.text
                   }
                 ]}
               >
@@ -256,13 +257,14 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
             </View>
             
             <View style={styles.translationSection}>
-              <Text style={[styles.translationLabel, { fontSize: fontSizes.labels }]}>English Meaning:</Text>
+              <Text style={[styles.translationLabel, { fontSize: fontSizes.labels, color: colors.spiritual }]}>English Meaning:</Text>
               <Text 
                 style={[
                   styles.englishText, 
                   { 
                     fontSize: fontSizes.english,
-                    lineHeight: fontSizes.english * 1.5
+                    lineHeight: fontSizes.english * 1.5,
+                    color: colors.text
                   }
                 ]}
               >
@@ -275,29 +277,45 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
       </PanGestureHandler>
 
       {/* Navigation Controls */}
-      <View style={styles.navigationContainer}>
+      <View style={[styles.navigationContainer, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
         <TouchableOpacity
-          style={[styles.navButton, !canGoPrevious && styles.disabledNavButton]}
+          style={[
+            styles.navButton, 
+            { backgroundColor: canGoPrevious ? colors.spiritual : colors.surface, borderColor: colors.border },
+            !canGoPrevious && styles.disabledNavButton
+          ]}
           onPress={() => navigateToVerse('previous')}
           disabled={!canGoPrevious}
         >
-          <Text style={[styles.navButtonText, !canGoPrevious && styles.disabledNavButtonText]}>
+          <Text style={[
+            styles.navButtonText, 
+            { color: canGoPrevious ? colors.buttonText : colors.textSecondary },
+            !canGoPrevious && styles.disabledNavButtonText
+          ]}>
             ← Previous
           </Text>
         </TouchableOpacity>
 
         <View style={styles.progressContainer}>
-          <Text style={styles.progressText}>
+          <Text style={[styles.progressText, { color: colors.text }]}>
             {currentVerse.verse_number} of {totalVerses}
           </Text>
         </View>
 
         <TouchableOpacity
-          style={[styles.navButton, !canGoNext && styles.disabledNavButton]}
+          style={[
+            styles.navButton, 
+            { backgroundColor: canGoNext ? colors.spiritual : colors.surface, borderColor: colors.border },
+            !canGoNext && styles.disabledNavButton
+          ]}
           onPress={() => navigateToVerse('next')}
           disabled={!canGoNext}
         >
-          <Text style={[styles.navButtonText, !canGoNext && styles.disabledNavButtonText]}>
+          <Text style={[
+            styles.navButtonText, 
+            { color: canGoNext ? colors.buttonText : colors.textSecondary },
+            !canGoNext && styles.disabledNavButtonText
+          ]}>
             Next →
           </Text>
         </TouchableOpacity>
@@ -347,18 +365,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
-  fontSizeButton: {
-    padding: 8,
-    backgroundColor: '#F5DEB3',
-    borderRadius: 16,
-    minWidth: 32,
-    alignItems: 'center',
-  },
-  fontSizeButtonText: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#8B4513',
-  },
   bookmarkButton: {
     padding: 8,
   },
@@ -366,13 +372,10 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: '#8B4513',
   },
-  fontControlsContainer: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    backgroundColor: '#f8f6f0',
-  },
-  fontControls: {
-    marginBottom: 0,
+  menuButton: {
+    padding: 8,
+    borderRadius: 10,
+    borderWidth: 1,
   },
   languageSelector: {
     backgroundColor: '#ffffff',

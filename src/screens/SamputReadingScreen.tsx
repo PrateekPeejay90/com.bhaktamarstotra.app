@@ -7,14 +7,18 @@ import {
   ScrollView,
   SafeAreaView
 } from 'react-native';
+import { List } from 'phosphor-react-native';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { dataService } from '../services/dataService';
 import { Verse } from '../types';
 import { useFontSize } from '../contexts/FontSizeContext';
+import { useTheme } from '../contexts/ThemeContext';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface SamputReadingScreenProps {
   samputVerseNumber: number;
   onBack: () => void;
+  onOpenDrawer: () => void;
 }
 
 interface SamputSequenceItem {
@@ -25,11 +29,13 @@ interface SamputSequenceItem {
 
 export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
   samputVerseNumber,
-  onBack
+  onBack,
+  onOpenDrawer
 }) => {
+  const { colors } = useTheme();
+  const { t } = useLanguage();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [samputSequence, setSamputSequence] = useState<SamputSequenceItem[]>([]);
-  const [showFontControls, setShowFontControls] = useState(false);
   
   const { fontSizes } = useFontSize();
   const totalVerses = dataService.getTotalVerses();
@@ -115,73 +121,66 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
   const getVerseTypeLabel = () => {
     if (!currentItem) return '';
     return currentItem.isSamputVerse 
-      ? `Samputt Verse ${samputVerseNumber}` 
-      : `Verse ${currentItem.verse.verse_number}`;
+      ? t.samputt.title 
+      : `${t.verseDetail.verse} ${currentItem.verse.verse_number}`;
   };
 
-  if (!currentItem) {
+  if (samputSequence.length === 0) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Loading Samputt Reading...</Text>
+          <Text style={[styles.loadingText, { color: colors.text }]}>{t.common.loading}</Text>
         </View>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={onBack}>
-          <Text style={styles.backButtonText}>← Back</Text>
+      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+        <TouchableOpacity style={[styles.backButton, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={onBack}>
+          <Text style={[styles.backButtonText, { color: colors.spiritual }]}>{t.navigation.back}</Text>
         </TouchableOpacity>
         
         <View style={styles.headerCenter}>
-          <Text style={styles.headerTitle}>Samputt Reading</Text>
-          <Text style={styles.headerSubtitle}>With Verse {samputVerseNumber}</Text>
+          <Text style={[styles.headerTitle, { color: colors.spiritual }]}>{t.samputt.title}</Text>
+          <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>{t.samputt.with} {samputVerseNumber}</Text>
         </View>
         
         <TouchableOpacity 
-          style={styles.fontSizeButton} 
-          onPress={() => setShowFontControls(!showFontControls)}
+          style={[styles.menuButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
+          onPress={onOpenDrawer}
         >
-          <Text style={styles.fontSizeButtonText}>Aa</Text>
+          <List size={20} color={colors.spiritual} weight="bold" />
         </TouchableOpacity>
       </View>
-
-      {/* Font Size Controls */}
-      {showFontControls && (
-        <View style={styles.fontControlsContainer}>
-          <Text style={styles.fontControlsNote}>
-            Font size controls from previous implementation can be added here
-          </Text>
-        </View>
-      )}
 
       {/* Verse Type Indicator */}
       <View style={[
         styles.verseTypeContainer,
+        { backgroundColor: currentItem.isSamputVerse ? colors.accent : colors.surface, borderBottomColor: colors.border },
         currentItem.isSamputVerse && styles.samputVerseTypeContainer
       ]}>
         <Text style={[
           styles.verseTypeText,
+          { color: currentItem.isSamputVerse ? colors.spiritual : colors.text },
           currentItem.isSamputVerse && styles.samputVerseTypeText
         ]}>
-          {currentItem.isSamputVerse ? '🕉️ ' : '📿 '}
-          {getVerseTypeLabel()}
+          {currentItem.isSamputVerse ? t.samputt.title : `${t.verseDetail.verse} ${currentItem.verse.verse_number}`}
         </Text>
       </View>
 
       {/* Verse Content */}
       <PanGestureHandler onGestureEvent={onSwipeGesture}>
-        <ScrollView style={styles.contentContainer} showsVerticalScrollIndicator={false}>
+        <ScrollView style={[styles.contentContainer, { backgroundColor: colors.background }]} showsVerticalScrollIndicator={false}>
         <View style={[
           styles.verseContent,
-          currentItem.isSamputVerse && styles.samputVerseContent
+          { backgroundColor: colors.surface },
+          currentItem.isSamputVerse && { borderLeftColor: colors.spiritual, backgroundColor: colors.accent }
         ]}>
           {/* Sanskrit Text */}
-          <View style={styles.sanskritContainer}>
+          <View style={[styles.sanskritContainer, { borderBottomColor: colors.border }]}>
             {currentItem.verse.content.split('\n').map((line, index) => (
               <Text 
                 key={index} 
@@ -189,7 +188,8 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
                   styles.sanskritText,
                   { 
                     fontSize: fontSizes.sanskrit,
-                    lineHeight: fontSizes.sanskrit * 1.5
+                    lineHeight: fontSizes.sanskrit * 1.5,
+                    color: colors.text
                   }
                 ]}
               >
@@ -199,10 +199,8 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
           </View>
 
           {/* Transliteration */}
-          <View style={styles.transliterationContainer}>
-            <Text style={[styles.sectionLabel, { fontSize: fontSizes.labels }]}>
-              Transliteration:
-            </Text>
+          <View style={[styles.transliterationContainer, { borderBottomColor: colors.border }]}>
+            <Text style={[styles.sectionLabel, { fontSize: fontSizes.labels, color: colors.spiritual }]}>{t.verseDetail.transliteration}:</Text>
             {currentItem.verse.transliteration.split('\n').map((line, index) => (
               <Text 
                 key={index} 
@@ -210,7 +208,8 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
                   styles.transliterationText,
                   { 
                     fontSize: fontSizes.transliteration,
-                    lineHeight: fontSizes.transliteration * 1.5
+                    lineHeight: fontSizes.transliteration * 1.5,
+                    color: colors.textSecondary
                   }
                 ]}
               >
@@ -221,7 +220,7 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
 
           {/* Hindi Meaning */}
           <View style={styles.meaningContainer}>
-            <Text style={[styles.sectionLabel, { fontSize: fontSizes.labels }]}>
+            <Text style={[styles.sectionLabel, { fontSize: fontSizes.labels, color: colors.spiritual }]}>
               Hindi Meaning:
             </Text>
             <Text 
@@ -229,7 +228,8 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
                 styles.hindiText,
                 { 
                   fontSize: fontSizes.hindi,
-                  lineHeight: fontSizes.hindi * 1.5
+                  lineHeight: fontSizes.hindi * 1.5,
+                  color: colors.text
                 }
               ]}
             >
@@ -239,7 +239,7 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
 
           {/* English Meaning */}
           <View style={styles.meaningContainer}>
-            <Text style={[styles.sectionLabel, { fontSize: fontSizes.labels }]}>
+            <Text style={[styles.sectionLabel, { fontSize: fontSizes.labels, color: colors.spiritual }]}>
               English Meaning:
             </Text>
             <Text 
@@ -247,7 +247,8 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
                 styles.englishText,
                 { 
                   fontSize: fontSizes.english,
-                  lineHeight: fontSizes.english * 1.5
+                  lineHeight: fontSizes.english * 1.5,
+                  color: colors.text
                 }
               ]}
             >
@@ -259,14 +260,19 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
       </PanGestureHandler>
 
       {/* Navigation Controls */}
-      <View style={styles.navigationContainer}>
+      <View style={[styles.navigationContainer, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
         <TouchableOpacity
-          style={[styles.navButton, !canGoPrevious && styles.disabledNavButton]}
+          style={[
+            styles.navButton, 
+            { backgroundColor: canGoPrevious ? colors.spiritual : colors.surface, borderColor: colors.border },
+            !canGoPrevious && styles.disabledNavButton
+          ]}
           onPress={() => navigateToIndex('previous')}
           disabled={!canGoPrevious}
         >
           <Text style={[
             styles.navButtonText,
+            { color: canGoPrevious ? colors.buttonText : colors.textSecondary },
             !canGoPrevious && styles.disabledNavButtonText
           ]}>
             Previous
@@ -274,19 +280,24 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
         </TouchableOpacity>
 
         <View style={styles.progressContainer}>
-          <Text style={styles.progressText}>{getProgressText()}</Text>
-          <Text style={styles.progressSubtext}>
-            {currentItem.isSamputVerse ? 'Samputt' : 'Regular'}
+          <Text style={[styles.progressText, { color: colors.text }]}>{getProgressText()}</Text>
+          <Text style={[styles.progressText, { color: colors.text }]}>
+            {currentIndex + 1} {t.samputt.of} {samputSequence.length}
           </Text>
         </View>
 
         <TouchableOpacity
-          style={[styles.navButton, !canGoNext && styles.disabledNavButton]}
+          style={[
+            styles.navButton, 
+            { backgroundColor: canGoNext ? colors.spiritual : colors.surface, borderColor: colors.border },
+            !canGoNext && styles.disabledNavButton
+          ]}
           onPress={() => navigateToIndex('next')}
           disabled={!canGoNext}
         >
           <Text style={[
             styles.navButtonText,
+            { color: canGoNext ? colors.buttonText : colors.textSecondary },
             !canGoNext && styles.disabledNavButtonText
           ]}>
             Next
@@ -343,27 +354,10 @@ const styles = StyleSheet.create({
     color: '#999999',
     marginTop: 2,
   },
-  fontSizeButton: {
+  menuButton: {
     padding: 8,
-    backgroundColor: '#F5DEB3',
-    borderRadius: 16,
-    minWidth: 32,
-    alignItems: 'center',
-  },
-  fontSizeButtonText: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#8B4513',
-  },
-  fontControlsContainer: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    backgroundColor: '#f8f6f0',
-  },
-  fontControlsNote: {
-    fontSize: 12,
-    color: '#666666',
-    textAlign: 'center',
+    borderRadius: 10,
+    borderWidth: 1,
   },
   verseTypeContainer: {
     backgroundColor: '#E6F3FF',

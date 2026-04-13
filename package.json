@@ -1,26 +1,42 @@
 {
   "name": "bhaktamar-stotra",
   "version": "1.0.0",
-  "main": "node_modules/expo/AppEntry.js",
+  "private": true,
   "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web"
+    "start": "react-native start",
+    "android": "react-native run-android",
+    "web": "webpack serve --config webpack.config.js --mode development",
+    "build:web": "webpack --config webpack.config.js --mode production && mkdir -p dist && cp public/privacy-policy.html dist/privacy-policy.html",
+    "bundle:android": "cd android && ./gradlew bundleRelease",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@react-native-async-storage/async-storage": "^2.2.0",
+    "phosphor-react-native": "^3.0.4",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-native": "0.80.2",
+    "react-native-gesture-handler": "^2.28.0",
+    "react-native-paper": "^5.14.5",
+    "react-native-safe-area-context": "^5.4.0",
+    "react-native-svg": "^15.12.1",
+    "react-native-vector-icons": "^10.3.0",
+    "react-native-web": "^0.20.0"
   },
   "devDependencies": {
-    "@types/react": "^19.1.0",
-    "@types/react-native": "^0.73.0",
-    "typescript": "^5.7.3"
-  },
-  "private": true,
-  "dependencies": {
-    "@expo/metro-runtime": "~5.0.4",
-    "expo": "^53.0.20",
-    "phosphor-react-native": "^3.0.0",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "react-native-gesture-handler": "^2.28.0",
-    "react-native-web": "^0.20.0"
+    "@babel/core": "^7.28.0",
+    "@babel/preset-env": "^7.28.0",
+    "@babel/runtime": "^7.28.0",
+    "@react-native-community/cli": "19.1.2",
+    "@react-native-community/cli-platform-android": "19.1.2",
+    "@react-native/babel-preset": "0.80.2",
+    "@react-native/metro-config": "0.80.2",
+    "@types/react": "^19.1.10",
+    "babel-loader": "^10.0.0",
+    "html-webpack-plugin": "^5.6.0",
+    "typescript": "^5.9.3",
+    "webpack": "^5.99.9",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.1"
   }
 }
