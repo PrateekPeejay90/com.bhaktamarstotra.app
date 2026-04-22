@@ -12,6 +12,7 @@ import { Divider, Surface } from 'react-native-paper';
 import { dataService } from '../services/dataService';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useTheme } from '../contexts/ThemeContext';
+import { BackIconButton } from '../components/BackIconButton';
 import {
   APP_NAME,
   APP_PACKAGE_ID,
@@ -57,12 +58,7 @@ export const AboutScreen: React.FC<AboutScreenProps> = ({ onBack, onOpenDrawer }
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]} contentContainerStyle={styles.content}>
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <TouchableOpacity
-          style={[styles.backButton, { backgroundColor: colors.surfaceVariant, borderColor: colors.border }]}
-          onPress={onBack}
-        >
-          <Text style={[styles.backButtonText, { color: colors.spiritual }]}>{t.navigation.back}</Text>
-        </TouchableOpacity>
+        <BackIconButton onPress={onBack} variant="surfaceVariant" />
 
         <View style={styles.headerCenter}>
           <Text style={[styles.headerTitle, { color: colors.spiritual }]}>{t.about.title}</Text>
@@ -147,16 +143,6 @@ const styles = StyleSheet.create({
     paddingTop: 12,
     paddingBottom: 18,
     borderBottomWidth: 1,
-  },
-  backButton: {
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 18,
-    borderWidth: 1,
-  },
-  backButtonText: {
-    fontSize: 15,
-    fontWeight: '600',
   },
   headerCenter: {
     flex: 1,

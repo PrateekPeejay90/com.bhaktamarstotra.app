@@ -11,6 +11,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { SearchBar } from '../components/SearchBar';
 import { SearchResults } from '../components/SearchResults';
+import { BackIconButton } from '../components/BackIconButton';
 import { searchService, SearchResult, SearchOptions } from '../services/searchService';
 import { Verse } from '../types';
 
@@ -101,12 +102,7 @@ export const SearchScreen: React.FC<SearchScreenProps> = ({
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity
-          style={[styles.backButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
-          onPress={onBack}
-        >
-          <Text style={[styles.backButtonText, { color: colors.spiritual }]}>{t.navigation.back}</Text>
-        </TouchableOpacity>
+        <BackIconButton onPress={onBack} />
         
         <Text style={[styles.headerTitle, { color: colors.text }]}>{t.search.title}</Text>
         
@@ -146,16 +142,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     gap: 16,
-  },
-  backButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    borderWidth: 1,
-  },
-  backButtonText: {
-    fontSize: 16,
-    fontWeight: '500',
   },
   headerTitle: {
     fontSize: 20,

@@ -4,7 +4,6 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  Modal,
   Animated,
   Dimensions,
   ScrollView,
@@ -50,79 +49,78 @@ export const MenuDrawer: React.FC<MenuDrawerProps> = ({
   }
 
   return (
-    <Modal transparent visible={visible} animationType="none" onRequestClose={onClose}>
-      <View style={styles.overlay}>
-        <TouchableOpacity style={styles.backdrop} activeOpacity={1} onPress={onClose} />
-        <Animated.View
-          style={[
-            styles.drawer,
-            {
-              backgroundColor: colors.surface,
-              borderRightColor: colors.border,
-              transform: [{ translateX: slideAnim }],
-              width: DRAWER_WIDTH,
-            },
-          ]}
-        >
-          <View style={[styles.header, { borderBottomColor: colors.border }]}>
-            <View>
-              <Text style={[styles.headerTitle, { color: colors.spiritual }]}>{t.menu.title}</Text>
-              <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>{t.menu.settings}</Text>
-            </View>
-            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <X size={24} color={colors.text} weight="bold" />
+    <View style={styles.overlay}>
+      <TouchableOpacity style={styles.backdrop} activeOpacity={1} onPress={onClose} />
+      <Animated.View
+        style={[
+          styles.drawer,
+          {
+            backgroundColor: colors.surface,
+            borderRightColor: colors.border,
+            transform: [{ translateX: slideAnim }],
+            width: DRAWER_WIDTH,
+          },
+        ]}
+      >
+        <View style={[styles.header, { borderBottomColor: colors.border }]}>
+          <View>
+            <Text style={[styles.headerTitle, { color: colors.spiritual }]}>{t.menu.title}</Text>
+            <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>{t.menu.settings}</Text>
+          </View>
+          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+            <X size={24} color={colors.text} weight="bold" />
+          </TouchableOpacity>
+        </View>
+
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+          <View style={[styles.navigationGroup, { borderBottomColor: colors.border }]}>
+            <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{t.menu.navigate}</Text>
+
+            <TouchableOpacity
+              style={[
+                styles.navButton,
+                {
+                  backgroundColor: activeScreen === 'home' ? colors.primaryContainer : colors.surfaceVariant,
+                  borderColor: activeScreen === 'home' ? colors.primary : colors.border,
+                },
+              ]}
+              onPress={onNavigateHome}
+            >
+              <House size={18} color={colors.spiritual} weight="bold" />
+              <Text style={[styles.navButtonText, { color: colors.text }]}>{t.navigation.home}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.navButton,
+                {
+                  backgroundColor: activeScreen === 'about' ? colors.primaryContainer : colors.surfaceVariant,
+                  borderColor: activeScreen === 'about' ? colors.primary : colors.border,
+                },
+              ]}
+              onPress={onNavigateAbout}
+            >
+              <Info size={18} color={colors.spiritual} weight="bold" />
+              <Text style={[styles.navButtonText, { color: colors.text }]}>{t.navigation.about}</Text>
             </TouchableOpacity>
           </View>
 
-          <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-            <View style={[styles.navigationGroup, { borderBottomColor: colors.border }]}>
-              <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{t.menu.navigate}</Text>
-
-              <TouchableOpacity
-                style={[
-                  styles.navButton,
-                  {
-                    backgroundColor: activeScreen === 'home' ? colors.primaryContainer : colors.surfaceVariant,
-                    borderColor: activeScreen === 'home' ? colors.primary : colors.border,
-                  },
-                ]}
-                onPress={onNavigateHome}
-              >
-                <House size={18} color={colors.spiritual} weight="bold" />
-                <Text style={[styles.navButtonText, { color: colors.text }]}>{t.navigation.home}</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[
-                  styles.navButton,
-                  {
-                    backgroundColor: activeScreen === 'about' ? colors.primaryContainer : colors.surfaceVariant,
-                    borderColor: activeScreen === 'about' ? colors.primary : colors.border,
-                  },
-                ]}
-                onPress={onNavigateAbout}
-              >
-                <Info size={18} color={colors.spiritual} weight="bold" />
-                <Text style={[styles.navButtonText, { color: colors.text }]}>{t.navigation.about}</Text>
-              </TouchableOpacity>
-            </View>
-
-            <LanguageMenu />
-            <FontSizeMenu />
-          </ScrollView>
-        </Animated.View>
-      </View>
-    </Modal>
+          <LanguageMenu />
+          <FontSizeMenu />
+        </ScrollView>
+      </Animated.View>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   overlay: {
-    flex: 1,
-    flexDirection: 'row',
+    ...StyleSheet.absoluteFillObject,
+    elevation: 999,
+    zIndex: 999,
   },
   backdrop: {
-    flex: 1,
+    ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0, 0, 0, 0.45)',
   },
   drawer: {
@@ -136,6 +134,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 14,
     elevation: 24,
+    zIndex: 1000,
   },
   header: {
     flexDirection: 'row',

@@ -13,6 +13,7 @@ import { dataService } from '../services/dataService';
 import { Verse } from '../types';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { BackIconButton } from '../components/BackIconButton';
 
 interface VerseListScreenProps {
   onVerseSelect: (verse: Verse) => void;
@@ -70,9 +71,7 @@ export const VerseListScreen: React.FC<VerseListScreenProps> = ({ onVerseSelect,
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-        <TouchableOpacity style={[styles.backButton, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={onBack}>
-          <Text style={[styles.backButtonText, { color: colors.spiritual }]}>{t.navigation.back}</Text>
-        </TouchableOpacity>
+        <BackIconButton onPress={onBack} />
         <Text style={[styles.headerTitle, { color: colors.spiritual }]}>{t.verseList.title}</Text>
         <TouchableOpacity 
           style={[styles.menuButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
@@ -124,14 +123,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
-  },
-  backButton: {
-    padding: 8,
-  },
-  backButtonText: {
-    color: '#8B4513',
-    fontSize: 16,
-    fontWeight: '600',
   },
   headerTitle: {
     fontSize: 18,

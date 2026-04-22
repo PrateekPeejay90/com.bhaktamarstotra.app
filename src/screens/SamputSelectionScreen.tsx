@@ -14,6 +14,7 @@ import { List } from 'phosphor-react-native';
 import { dataService } from '../services/dataService';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { BackIconButton } from '../components/BackIconButton';
 
 interface SamputSelectionScreenProps {
   onBack: () => void;
@@ -90,9 +91,7 @@ export const SamputSelectionScreen: React.FC<SamputSelectionScreenProps> = ({
       <ScrollView style={styles.content}>
         {/* Header */}
         <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-          <TouchableOpacity style={[styles.backButton, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={onBack}>
-            <Text style={[styles.backButtonText, { color: colors.spiritual }]}>{t.navigation.back}</Text>
-          </TouchableOpacity>
+          <BackIconButton onPress={onBack} />
           <Text style={[styles.headerTitle, { color: colors.spiritual }]}>{t.samputt.title}</Text>
           <TouchableOpacity 
             style={[styles.menuButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
@@ -192,14 +191,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
   },
-  backButton: {
-    padding: 8,
-  },
-  backButtonText: {
-    color: '#8B4513',
-    fontSize: 16,
-    fontWeight: '600',
-  },
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
@@ -272,18 +263,20 @@ const styles = StyleSheet.create({
   inputContainer: {
     alignItems: 'center',
     marginBottom: 24,
+    width: '100%',
   },
   verseInput: {
-    borderWidth: 2,
+    width: '100%',
+    borderWidth: 1.5,
     borderColor: '#8B4513',
-    borderRadius: 12,
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    fontSize: 24,
-    fontWeight: 'bold',
+    borderRadius: 14,
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    fontSize: 18,
+    fontWeight: '600',
     color: '#8B4513',
     textAlign: 'center',
-    minWidth: 100,
+    minHeight: 52,
     backgroundColor: '#F5DEB3',
   },
   quickSelectContainer: {

@@ -14,6 +14,7 @@ import { Verse } from '../types';
 import { useFontSize } from '../contexts/FontSizeContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { BackIconButton } from '../components/BackIconButton';
 
 interface SamputReadingScreenProps {
   samputVerseNumber: number;
@@ -113,11 +114,6 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
     }
   };
 
-  const getProgressText = () => {
-    if (!currentItem) return '';
-    return `${currentIndex + 1} of ${samputSequence.length}`;
-  };
-
   const getVerseTypeLabel = () => {
     if (!currentItem) return '';
     return currentItem.isSamputVerse 
@@ -139,9 +135,7 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-        <TouchableOpacity style={[styles.backButton, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={onBack}>
-          <Text style={[styles.backButtonText, { color: colors.spiritual }]}>{t.navigation.back}</Text>
-        </TouchableOpacity>
+        <BackIconButton onPress={onBack} />
         
         <View style={styles.headerCenter}>
           <Text style={[styles.headerTitle, { color: colors.spiritual }]}>{t.samputt.title}</Text>
@@ -172,92 +166,98 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
       </View>
 
       {/* Verse Content */}
-      <PanGestureHandler onGestureEvent={onSwipeGesture}>
-        <ScrollView style={[styles.contentContainer, { backgroundColor: colors.background }]} showsVerticalScrollIndicator={false}>
-        <View style={[
-          styles.verseContent,
-          { backgroundColor: colors.surface },
-          currentItem.isSamputVerse && { borderLeftColor: colors.spiritual, backgroundColor: colors.accent }
-        ]}>
-          {/* Sanskrit Text */}
-          <View style={[styles.sanskritContainer, { borderBottomColor: colors.border }]}>
-            {currentItem.verse.content.split('\n').map((line, index) => (
-              <Text 
-                key={index} 
-                style={[
-                  styles.sanskritText,
-                  { 
-                    fontSize: fontSizes.sanskrit,
-                    lineHeight: fontSizes.sanskrit * 1.5,
-                    color: colors.text
-                  }
-                ]}
-              >
-                {line}
-              </Text>
-            ))}
-          </View>
-
-          {/* Transliteration */}
-          <View style={[styles.transliterationContainer, { borderBottomColor: colors.border }]}>
-            <Text style={[styles.sectionLabel, { fontSize: fontSizes.labels, color: colors.spiritual }]}>{t.verseDetail.transliteration}:</Text>
-            {currentItem.verse.transliteration.split('\n').map((line, index) => (
-              <Text 
-                key={index} 
-                style={[
-                  styles.transliterationText,
-                  { 
-                    fontSize: fontSizes.transliteration,
-                    lineHeight: fontSizes.transliteration * 1.5,
-                    color: colors.textSecondary
-                  }
-                ]}
-              >
-                {line}
-              </Text>
-            ))}
-          </View>
-
-          {/* Hindi Meaning */}
-          <View style={styles.meaningContainer}>
-            <Text style={[styles.sectionLabel, { fontSize: fontSizes.labels, color: colors.spiritual }]}>
-              Hindi Meaning:
-            </Text>
-            <Text 
+      <View style={styles.contentArea}>
+        <PanGestureHandler onGestureEvent={onSwipeGesture}>
+          <ScrollView
+            style={[styles.contentContainer, { backgroundColor: colors.background }]}
+            contentContainerStyle={styles.contentScrollContent}
+            showsVerticalScrollIndicator={false}
+          >
+            <View
               style={[
-                styles.hindiText,
-                { 
-                  fontSize: fontSizes.hindi,
-                  lineHeight: fontSizes.hindi * 1.5,
-                  color: colors.text
-                }
+                styles.verseContent,
+                { backgroundColor: colors.surface },
+                currentItem.isSamputVerse && { borderLeftColor: colors.spiritual, backgroundColor: colors.accent },
               ]}
             >
-              {currentItem.verse.hindi_meaning}
-            </Text>
-          </View>
+              <View style={[styles.sanskritContainer, { borderBottomColor: colors.border }]}>
+                {currentItem.verse.content.split('\n').map((line, index) => (
+                  <Text
+                    key={index}
+                    style={[
+                      styles.sanskritText,
+                      {
+                        fontSize: fontSizes.sanskrit,
+                        lineHeight: fontSizes.sanskrit * 1.5,
+                        color: colors.text,
+                      },
+                    ]}
+                  >
+                    {line}
+                  </Text>
+                ))}
+              </View>
 
-          {/* English Meaning */}
-          <View style={styles.meaningContainer}>
-            <Text style={[styles.sectionLabel, { fontSize: fontSizes.labels, color: colors.spiritual }]}>
-              English Meaning:
-            </Text>
-            <Text 
-              style={[
-                styles.englishText,
-                { 
-                  fontSize: fontSizes.english,
-                  lineHeight: fontSizes.english * 1.5,
-                  color: colors.text
-                }
-              ]}
-            >
-              {currentItem.verse.english_meaning}
-            </Text>
-          </View>
-        </View>
-        </ScrollView>
-      </PanGestureHandler>
+              <View style={[styles.transliterationContainer, { borderBottomColor: colors.border }]}>
+                <Text style={[styles.sectionLabel, { fontSize: fontSizes.labels, color: colors.spiritual }]}>
+                  {t.verseDetail.transliteration}:
+                </Text>
+                {currentItem.verse.transliteration.split('\n').map((line, index) => (
+                  <Text
+                    key={index}
+                    style={[
+                      styles.transliterationText,
+                      {
+                        fontSize: fontSizes.transliteration,
+                        lineHeight: fontSizes.transliteration * 1.5,
+                        color: colors.textSecondary,
+                      },
+                    ]}
+                  >
+                    {line}
+                  </Text>
+                ))}
+              </View>
+
+              <View style={styles.meaningContainer}>
+                <Text style={[styles.sectionLabel, { fontSize: fontSizes.labels, color: colors.spiritual }]}>
+                  Hindi Meaning:
+                </Text>
+                <Text
+                  style={[
+                    styles.hindiText,
+                    {
+                      fontSize: fontSizes.hindi,
+                      lineHeight: fontSizes.hindi * 1.5,
+                      color: colors.text,
+                    },
+                  ]}
+                >
+                  {currentItem.verse.hindi_meaning}
+                </Text>
+              </View>
+
+              <View style={styles.meaningContainer}>
+                <Text style={[styles.sectionLabel, { fontSize: fontSizes.labels, color: colors.spiritual }]}>
+                  English Meaning:
+                </Text>
+                <Text
+                  style={[
+                    styles.englishText,
+                    {
+                      fontSize: fontSizes.english,
+                      lineHeight: fontSizes.english * 1.5,
+                      color: colors.text,
+                    },
+                  ]}
+                >
+                  {currentItem.verse.english_meaning}
+                </Text>
+              </View>
+            </View>
+          </ScrollView>
+        </PanGestureHandler>
+      </View>
 
       {/* Navigation Controls */}
       <View style={[styles.navigationContainer, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
@@ -280,9 +280,11 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
         </TouchableOpacity>
 
         <View style={styles.progressContainer}>
-          <Text style={[styles.progressText, { color: colors.text }]}>{getProgressText()}</Text>
           <Text style={[styles.progressText, { color: colors.text }]}>
             {currentIndex + 1} {t.samputt.of} {samputSequence.length}
+          </Text>
+          <Text style={[styles.progressSubtext, { color: colors.textSecondary }]}>
+            {getVerseTypeLabel()}
           </Text>
         </View>
 
@@ -332,14 +334,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
   },
-  backButton: {
-    padding: 8,
-  },
-  backButtonText: {
-    color: '#8B4513',
-    fontSize: 16,
-    fontWeight: '600',
-  },
   headerCenter: {
     alignItems: 'center',
     flex: 1,
@@ -378,8 +372,14 @@ const styles = StyleSheet.create({
   samputVerseTypeText: {
     color: '#8B4513',
   },
+  contentArea: {
+    flex: 1,
+  },
   contentContainer: {
     flex: 1,
+  },
+  contentScrollContent: {
+    paddingBottom: 16,
   },
   verseContent: {
     backgroundColor: '#ffffff',
@@ -443,6 +443,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     borderTopWidth: 1,
     borderTopColor: '#e0e0e0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 8,
   },
   navButton: {
     paddingHorizontal: 20,
