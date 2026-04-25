@@ -38,7 +38,7 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [samputSequence, setSamputSequence] = useState<SamputSequenceItem[]>([]);
   
-  const { fontSizes } = useFontSize();
+  const { fontSizes, scaleFontSize } = useFontSize();
   const totalVerses = dataService.getTotalVerses();
 
   useEffect(() => {
@@ -125,7 +125,7 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.loadingContainer}>
-          <Text style={[styles.loadingText, { color: colors.text }]}>{t.common.loading}</Text>
+          <Text style={[styles.loadingText, { color: colors.text, fontSize: scaleFontSize(18) }]}>{t.common.loading}</Text>
         </View>
       </SafeAreaView>
     );
@@ -138,8 +138,8 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
         <BackIconButton onPress={onBack} />
         
         <View style={styles.headerCenter}>
-          <Text style={[styles.headerTitle, { color: colors.spiritual }]}>{t.samputt.title}</Text>
-          <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>{t.samputt.with} {samputVerseNumber}</Text>
+          <Text style={[styles.headerTitle, { color: colors.spiritual, fontSize: scaleFontSize(18) }]}>{t.samputt.title}</Text>
+          <Text style={[styles.headerSubtitle, { color: colors.textSecondary, fontSize: scaleFontSize(12) }]}>{t.samputt.with} {samputVerseNumber}</Text>
         </View>
         
         <TouchableOpacity 
@@ -158,7 +158,7 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
       ]}>
         <Text style={[
           styles.verseTypeText,
-          { color: currentItem.isSamputVerse ? colors.spiritual : colors.text },
+          { color: currentItem.isSamputVerse ? colors.spiritual : colors.text, fontSize: scaleFontSize(16) },
           currentItem.isSamputVerse && styles.samputVerseTypeText
         ]}>
           {currentItem.isSamputVerse ? t.samputt.title : `${t.verseDetail.verse} ${currentItem.verse.verse_number}`}
@@ -272,7 +272,7 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
         >
           <Text style={[
             styles.navButtonText,
-            { color: canGoPrevious ? colors.buttonText : colors.textSecondary },
+            { color: canGoPrevious ? colors.buttonText : colors.textSecondary, fontSize: scaleFontSize(16) },
             !canGoPrevious && styles.disabledNavButtonText
           ]}>
             Previous
@@ -280,10 +280,10 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
         </TouchableOpacity>
 
         <View style={styles.progressContainer}>
-          <Text style={[styles.progressText, { color: colors.text }]}>
+          <Text style={[styles.progressText, { color: colors.text, fontSize: scaleFontSize(14) }]}>
             {currentIndex + 1} {t.samputt.of} {samputSequence.length}
           </Text>
-          <Text style={[styles.progressSubtext, { color: colors.textSecondary }]}>
+          <Text style={[styles.progressSubtext, { color: colors.textSecondary, fontSize: scaleFontSize(12) }]}>
             {getVerseTypeLabel()}
           </Text>
         </View>
@@ -299,7 +299,7 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
         >
           <Text style={[
             styles.navButtonText,
-            { color: canGoNext ? colors.buttonText : colors.textSecondary },
+            { color: canGoNext ? colors.buttonText : colors.textSecondary, fontSize: scaleFontSize(16) },
             !canGoNext && styles.disabledNavButtonText
           ]}>
             Next

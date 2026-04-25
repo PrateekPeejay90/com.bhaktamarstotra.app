@@ -8,18 +8,18 @@ import {
   Dimensions,
   ScrollView,
 } from 'react-native';
-import { House, Info, X } from 'phosphor-react-native';
+import { House, X } from 'phosphor-react-native';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useFontSize } from '../contexts/FontSizeContext';
 import { FontSizeMenu } from './FontSizeMenu';
 import { LanguageMenu } from './LanguageMenu';
 
 interface MenuDrawerProps {
   visible: boolean;
-  activeScreen: 'home' | 'verseList' | 'verseDetail' | 'samputSelection' | 'samputReading' | 'search' | 'about';
+  activeScreen: 'home' | 'verseList' | 'verseDetail' | 'samputSelection' | 'samputReading' | 'search';
   onClose: () => void;
   onNavigateHome: () => void;
-  onNavigateAbout: () => void;
 }
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -30,10 +30,10 @@ export const MenuDrawer: React.FC<MenuDrawerProps> = ({
   activeScreen,
   onClose,
   onNavigateHome,
-  onNavigateAbout,
 }) => {
   const { colors } = useTheme();
   const { t } = useLanguage();
+  const { scaleFontSize } = useFontSize();
   const slideAnim = React.useRef(new Animated.Value(-DRAWER_WIDTH)).current;
 
   React.useEffect(() => {
@@ -64,8 +64,8 @@ export const MenuDrawer: React.FC<MenuDrawerProps> = ({
       >
         <View style={[styles.header, { borderBottomColor: colors.border }]}>
           <View>
-            <Text style={[styles.headerTitle, { color: colors.spiritual }]}>{t.menu.title}</Text>
-            <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>{t.menu.settings}</Text>
+            <Text style={[styles.headerTitle, { color: colors.spiritual, fontSize: scaleFontSize(24) }]}>{t.menu.title}</Text>
+            <Text style={[styles.headerSubtitle, { color: colors.textSecondary, fontSize: scaleFontSize(13) }]}>{t.menu.settings}</Text>
           </View>
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
             <X size={24} color={colors.text} weight="bold" />
@@ -74,7 +74,7 @@ export const MenuDrawer: React.FC<MenuDrawerProps> = ({
 
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           <View style={[styles.navigationGroup, { borderBottomColor: colors.border }]}>
-            <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{t.menu.navigate}</Text>
+            <Text style={[styles.sectionTitle, { color: colors.textSecondary, fontSize: scaleFontSize(12) }]}>{t.menu.navigate}</Text>
 
             <TouchableOpacity
               style={[
@@ -87,26 +87,26 @@ export const MenuDrawer: React.FC<MenuDrawerProps> = ({
               onPress={onNavigateHome}
             >
               <House size={18} color={colors.spiritual} weight="bold" />
-              <Text style={[styles.navButtonText, { color: colors.text }]}>{t.navigation.home}</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[
-                styles.navButton,
-                {
-                  backgroundColor: activeScreen === 'about' ? colors.primaryContainer : colors.surfaceVariant,
-                  borderColor: activeScreen === 'about' ? colors.primary : colors.border,
-                },
-              ]}
-              onPress={onNavigateAbout}
-            >
-              <Info size={18} color={colors.spiritual} weight="bold" />
-              <Text style={[styles.navButtonText, { color: colors.text }]}>{t.navigation.about}</Text>
+              <Text style={[styles.navButtonText, { color: colors.text, fontSize: scaleFontSize(15) }]}>{t.navigation.home}</Text>
             </TouchableOpacity>
           </View>
 
           <LanguageMenu />
           <FontSizeMenu />
+
+          <View style={[styles.privacyGroup, { borderBottomColor: colors.border }]}>
+            <Text style={[styles.sectionTitle, { color: colors.textSecondary, fontSize: scaleFontSize(12) }]}>
+              {t.menu.privacyPolicy}
+            </Text>
+            <View style={[styles.privacyCard, { backgroundColor: colors.surfaceVariant, borderColor: colors.border }]}>
+              <Text style={[styles.privacyText, { color: colors.text, fontSize: scaleFontSize(13), lineHeight: scaleFontSize(13) * 1.45 }]}>
+                {t.menu.privacySummary}
+              </Text>
+              <Text style={[styles.privacyContact, { color: colors.spiritual, fontSize: scaleFontSize(12) }]}>
+                {t.menu.privacyContact}
+              </Text>
+            </View>
+          </View>
         </ScrollView>
       </Animated.View>
     </View>
@@ -181,6 +181,24 @@ const styles = StyleSheet.create({
   },
   navButtonText: {
     fontSize: 15,
+    fontWeight: '600',
+  },
+  privacyGroup: {
+    borderBottomWidth: 1,
+    padding: 16,
+    gap: 10,
+  },
+  privacyCard: {
+    borderRadius: 12,
+    borderWidth: 1,
+    padding: 14,
+    gap: 10,
+  },
+  privacyText: {
+    fontSize: 13,
+  },
+  privacyContact: {
+    fontSize: 12,
     fontWeight: '600',
   },
 });

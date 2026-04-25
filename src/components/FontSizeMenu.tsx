@@ -7,7 +7,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 
 export const FontSizeMenu: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const { currentLevel, fontSizes, increaseFontSize, decreaseFontSize } = useFontSize();
+  const { currentLevel, fontSizes, increaseFontSize, decreaseFontSize, scaleFontSize } = useFontSize();
   const { colors } = useTheme();
   const { t } = useLanguage();
 
@@ -24,10 +24,10 @@ export const FontSizeMenu: React.FC = () => {
       >
         <View style={styles.headerLeft}>
           <TextAa size={20} color={colors.spiritual} weight="bold" />
-          <Text style={[styles.title, { color: colors.spiritual }]}>{t.menu.fontSize}</Text>
+          <Text style={[styles.title, { color: colors.spiritual, fontSize: scaleFontSize(16) }]}>{t.menu.fontSize}</Text>
         </View>
         <View style={styles.headerRight}>
-          <Text style={[styles.currentLevel, { color: colors.textSecondary }]}>
+          <Text style={[styles.currentLevel, { color: colors.textSecondary, fontSize: scaleFontSize(14) }]}>
             {currentLevel.charAt(0).toUpperCase() + currentLevel.slice(1).replace('-', ' ')}
           </Text>
           {isExpanded ? (
@@ -43,7 +43,7 @@ export const FontSizeMenu: React.FC = () => {
         <View style={styles.expandedContent}>
           {/* Preview Text */}
           <View style={[styles.previewContainer, { backgroundColor: colors.background, borderColor: colors.border }]}>
-            <Text style={[styles.previewLabel, { color: colors.textSecondary }]}>{t.menu.preview}</Text>
+            <Text style={[styles.previewLabel, { color: colors.textSecondary, fontSize: scaleFontSize(12) }]}>{t.menu.preview}</Text>
             <Text style={[styles.previewSanskrit, { color: colors.text, fontSize: fontSizes.sanskrit }]}>
               भक्तामर स्तोत्र
             </Text>
@@ -64,7 +64,7 @@ export const FontSizeMenu: React.FC = () => {
               disabled={!canDecrease}
             >
               <Minus size={20} color={canDecrease ? colors.spiritual : colors.textSecondary} weight="bold" />
-              <Text style={[styles.buttonLabel, { color: canDecrease ? colors.spiritual : colors.textSecondary }]}>{t.menu.smaller}</Text>
+              <Text style={[styles.buttonLabel, { color: canDecrease ? colors.spiritual : colors.textSecondary, fontSize: scaleFontSize(14) }]}>{t.menu.smaller}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -77,7 +77,7 @@ export const FontSizeMenu: React.FC = () => {
               disabled={!canIncrease}
             >
               <Plus size={20} color={canIncrease ? colors.spiritual : colors.textSecondary} weight="bold" />
-              <Text style={[styles.buttonLabel, { color: canIncrease ? colors.spiritual : colors.textSecondary }]}>{t.menu.larger}</Text>
+              <Text style={[styles.buttonLabel, { color: canIncrease ? colors.spiritual : colors.textSecondary, fontSize: scaleFontSize(14) }]}>{t.menu.larger}</Text>
             </TouchableOpacity>
           </View>
         </View>

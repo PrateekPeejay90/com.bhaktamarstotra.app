@@ -16,7 +16,6 @@ interface Translations {
     back: string;
     menu: string;
     home: string;
-    about: string;
   };
   verseList: {
     title: string;
@@ -66,6 +65,9 @@ interface Translations {
     title: string;
     settings: string;
     navigate: string;
+    privacyPolicy: string;
+    privacySummary: string;
+    privacyContact: string;
     fontSize: string;
     language: string;
     smaller: string;
@@ -75,25 +77,6 @@ interface Translations {
     medium: string;
     large: string;
     extraLarge: string;
-  };
-  about: {
-    title: string;
-    subtitle: string;
-    appInfo: string;
-    privacyTitle: string;
-    localOnly: string;
-    dataStored: string;
-    noTracking: string;
-    privacyPolicy: string;
-    openPolicy: string;
-    version: string;
-    packageId: string;
-    author: string;
-    totalVerses: string;
-    hostingHint: string;
-    complianceTitle: string;
-    playStoreReady: string;
-    releaseNote: string;
   };
   common: {
     loading: string;
@@ -118,7 +101,6 @@ const translations: Record<LanguageCode, Translations> = {
       back: 'Back',
       menu: 'Menu',
       home: 'Home',
-      about: 'About & Privacy',
     },
     verseList: {
       title: 'All Verses',
@@ -168,6 +150,9 @@ const translations: Record<LanguageCode, Translations> = {
       title: 'Menu',
       settings: 'Reading settings',
       navigate: 'Navigate',
+      privacyPolicy: 'Privacy Policy',
+      privacySummary: 'Bhaktamar Stotra does not collect, transmit, sell, or share personal data. Only your selected language and font-size preference are stored locally on your device.',
+      privacyContact: 'Privacy contact: prateekpeejay@gmail.com',
       fontSize: 'Font Size',
       language: 'Language',
       smaller: 'Smaller',
@@ -177,25 +162,6 @@ const translations: Record<LanguageCode, Translations> = {
       medium: 'Medium',
       large: 'Large',
       extraLarge: 'Extra Large',
-    },
-    about: {
-      title: 'About & Privacy',
-      subtitle: 'Release readiness and data handling',
-      appInfo: 'Application Info',
-      privacyTitle: 'Privacy & Data Safety',
-      localOnly: 'This app is designed to work offline and does not send devotional content or personal data to a backend service.',
-      dataStored: 'Only your on-device reading preferences, such as language and font size, are stored locally using AsyncStorage.',
-      noTracking: 'No analytics, ads, account creation, cloud sync, or sensitive runtime permissions are used in the current implementation.',
-      privacyPolicy: 'Privacy policy URL',
-      openPolicy: 'Open hosted privacy policy',
-      version: 'Version',
-      packageId: 'Package ID',
-      author: 'Author',
-      totalVerses: 'Total Verses',
-      hostingHint: 'Host privacy-policy.html before store submission',
-      complianceTitle: 'Android Release Notes',
-      playStoreReady: 'Google Play submission still requires a hosted privacy-policy URL, final screenshots, a signed AAB, Play App Signing, and a completed Data safety declaration.',
-      releaseNote: 'This screen is now the in-app privacy reference required by Play policy. Replace the placeholder contact details in privacy-policy.html before publishing.',
     },
     common: {
       loading: 'Loading...',
@@ -218,7 +184,6 @@ const translations: Record<LanguageCode, Translations> = {
       back: 'वापस',
       menu: 'मेनू',
       home: 'होम',
-      about: 'जानकारी और गोपनीयता',
     },
     verseList: {
       title: 'सभी श्लोक',
@@ -268,6 +233,9 @@ const translations: Record<LanguageCode, Translations> = {
       title: 'मेनू',
       settings: 'पाठ सेटिंग्स',
       navigate: 'नेविगेशन',
+      privacyPolicy: 'गोपनीयता नीति',
+      privacySummary: 'भक्तामर स्तोत्र आपका व्यक्तिगत डेटा collect, transmit, sell या share नहीं करता। केवल आपकी चुनी हुई भाषा और फ़ॉन्ट आकार की पसंद आपके डिवाइस पर स्थानीय रूप से सहेजी जाती है।',
+      privacyContact: 'गोपनीयता संपर्क: prateekpeejay@gmail.com',
       fontSize: 'फ़ॉन्ट आकार',
       language: 'भाषा',
       smaller: 'छोटा',
@@ -277,25 +245,6 @@ const translations: Record<LanguageCode, Translations> = {
       medium: 'मध्यम',
       large: 'बड़ा',
       extraLarge: 'अतिरिक्त बड़ा',
-    },
-    about: {
-      title: 'जानकारी और गोपनीयता',
-      subtitle: 'रिलीज़ तैयारी और डेटा उपयोग',
-      appInfo: 'एप्लिकेशन जानकारी',
-      privacyTitle: 'गोपनीयता और डेटा सुरक्षा',
-      localOnly: 'यह ऐप ऑफलाइन उपयोग के लिए बनाया गया है और किसी सर्वर पर व्यक्तिगत या devotional डेटा नहीं भेजता।',
-      dataStored: 'केवल भाषा और फ़ॉन्ट आकार जैसी आपकी पढ़ने की पसंद AsyncStorage के माध्यम से आपके डिवाइस पर स्थानीय रूप से सहेजी जाती है।',
-      noTracking: 'वर्तमान संस्करण में कोई analytics, विज्ञापन, account creation, cloud sync या sensitive runtime permission नहीं है।',
-      privacyPolicy: 'गोपनीयता नीति URL',
-      openPolicy: 'होस्ट की गई गोपनीयता नीति खोलें',
-      version: 'संस्करण',
-      packageId: 'पैकेज आईडी',
-      author: 'लेखक',
-      totalVerses: 'कुल श्लोक',
-      hostingHint: 'स्टोर सबमिशन से पहले privacy-policy.html होस्ट करें',
-      complianceTitle: 'Android रिलीज़ नोट्स',
-      playStoreReady: 'Google Play पर प्रकाशित करने के लिए अभी भी hosted privacy-policy URL, अंतिम screenshots, signed AAB, Play App Signing और Data safety declaration की आवश्यकता होगी।',
-      releaseNote: 'यह स्क्रीन अब Play नीति के लिए in-app privacy reference है। प्रकाशित करने से पहले privacy-policy.html में placeholder contact details बदलें।',
     },
     common: {
       loading: 'लोड हो रहा है...',

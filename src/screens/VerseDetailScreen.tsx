@@ -33,7 +33,7 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
   const [isBookmarked, setIsBookmarked] = useState(false);
   
   // Use font size context and theme
-  const { fontSizes } = useFontSize();
+  const { fontSizes, scaleFontSize } = useFontSize();
   const { colors } = useTheme();
   const { t } = useLanguage();
 
@@ -87,13 +87,13 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
         <BackIconButton onPress={onBack} />
         
         <View style={styles.headerCenter}>
-          <Text style={[styles.verseTitle, { color: colors.spiritual }]}>{t.verseDetail.verse} {currentVerse.verse_number}</Text>
-          <Text style={[styles.pageInfo, { color: colors.textSecondary }]}>{t.verseDetail.page} {currentVerse.page_number}</Text>
+          <Text style={[styles.verseTitle, { color: colors.spiritual, fontSize: scaleFontSize(18) }]}>{t.verseDetail.verse} {currentVerse.verse_number}</Text>
+          <Text style={[styles.pageInfo, { color: colors.textSecondary, fontSize: scaleFontSize(12) }]}>{t.verseDetail.page} {currentVerse.page_number}</Text>
         </View>
         
         <View style={styles.headerRight}>
           <TouchableOpacity style={[styles.bookmarkButton, { backgroundColor: colors.accent }]} onPress={toggleBookmark}>
-            <Text style={[styles.bookmarkText, { color: colors.spiritual }]}>{isBookmarked ? '★' : '☆'}</Text>
+            <Text style={[styles.bookmarkText, { color: colors.spiritual, fontSize: scaleFontSize(24) }]}>{isBookmarked ? '★' : '☆'}</Text>
           </TouchableOpacity>
           <TouchableOpacity 
             style={[styles.menuButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
@@ -208,8 +208,8 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
           disabled={!canGoPrevious}
         >
           <Text style={[
-            styles.navButtonText, 
-            { color: canGoPrevious ? colors.buttonText : colors.textSecondary },
+            styles.navButtonText,
+            { color: canGoPrevious ? colors.buttonText : colors.textSecondary, fontSize: scaleFontSize(16) },
             !canGoPrevious && styles.disabledNavButtonText
           ]}>
             ← Previous
@@ -217,7 +217,7 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
         </TouchableOpacity>
 
         <View style={styles.progressContainer}>
-          <Text style={[styles.progressText, { color: colors.text }]}>
+          <Text style={[styles.progressText, { color: colors.text, fontSize: scaleFontSize(14) }]}>
             {currentVerse.verse_number} of {totalVerses}
           </Text>
         </View>
@@ -232,8 +232,8 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
           disabled={!canGoNext}
         >
           <Text style={[
-            styles.navButtonText, 
-            { color: canGoNext ? colors.buttonText : colors.textSecondary },
+            styles.navButtonText,
+            { color: canGoNext ? colors.buttonText : colors.textSecondary, fontSize: scaleFontSize(16) },
             !canGoNext && styles.disabledNavButtonText
           ]}>
             Next →

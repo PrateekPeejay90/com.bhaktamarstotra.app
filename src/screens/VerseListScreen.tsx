@@ -13,6 +13,7 @@ import { dataService } from '../services/dataService';
 import { Verse } from '../types';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useFontSize } from '../contexts/FontSizeContext';
 import { BackIconButton } from '../components/BackIconButton';
 
 interface VerseListScreenProps {
@@ -24,6 +25,7 @@ interface VerseListScreenProps {
 export const VerseListScreen: React.FC<VerseListScreenProps> = ({ onVerseSelect, onBack, onOpenDrawer }) => {
   const { colors } = useTheme();
   const { t } = useLanguage();
+  const { fontSizes, scaleFontSize } = useFontSize();
   const [verses, setVerses] = useState<Verse[]>([]);
   const [filteredVerses, setFilteredVerses] = useState<Verse[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -49,19 +51,19 @@ export const VerseListScreen: React.FC<VerseListScreenProps> = ({ onVerseSelect,
       onPress={() => onVerseSelect(item)}
     >
       <View style={styles.verseHeader}>
-        <Text style={[styles.verseNumber, { color: colors.spiritual }]}>Verse {item.verse_number}</Text>
-        <Text style={[styles.pageNumber, { color: colors.textSecondary }]}>Page {item.page_number}</Text>
+        <Text style={[styles.verseNumber, { color: colors.spiritual, fontSize: fontSizes.labels }]}>{t.verseDetail.verse} {item.verse_number}</Text>
+        <Text style={[styles.pageNumber, { color: colors.textSecondary, fontSize: scaleFontSize(12) }]}>{t.verseDetail.page} {item.page_number}</Text>
       </View>
       
-      <Text style={[styles.sanskritPreview, { color: colors.text }]} numberOfLines={2}>
+      <Text style={[styles.sanskritPreview, { color: colors.text, fontSize: fontSizes.sanskrit, lineHeight: fontSizes.sanskrit * 1.5 }]} numberOfLines={2}>
         {item.content}
       </Text>
       
-      <Text style={[styles.transliterationPreview, { color: colors.textSecondary }]} numberOfLines={1}>
+      <Text style={[styles.transliterationPreview, { color: colors.textSecondary, fontSize: fontSizes.transliteration, lineHeight: fontSizes.transliteration * 1.45 }]} numberOfLines={1}>
         {item.transliteration}
       </Text>
       
-      <Text style={[styles.meaningPreview, { color: colors.text }]} numberOfLines={2}>
+      <Text style={[styles.meaningPreview, { color: colors.text, fontSize: fontSizes.hindi, lineHeight: fontSizes.hindi * 1.45 }]} numberOfLines={2}>
         {item.hindi_meaning}
       </Text>
     </TouchableOpacity>
@@ -72,7 +74,7 @@ export const VerseListScreen: React.FC<VerseListScreenProps> = ({ onVerseSelect,
       {/* Header */}
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
         <BackIconButton onPress={onBack} />
-        <Text style={[styles.headerTitle, { color: colors.spiritual }]}>{t.verseList.title}</Text>
+        <Text style={[styles.headerTitle, { color: colors.spiritual, fontSize: scaleFontSize(18) }]}>{t.verseList.title}</Text>
         <TouchableOpacity 
           style={[styles.menuButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
           onPress={onOpenDrawer}
@@ -84,7 +86,7 @@ export const VerseListScreen: React.FC<VerseListScreenProps> = ({ onVerseSelect,
       {/* Search Bar */}
       <View style={styles.searchContainer}>
         <TextInput
-          style={[styles.searchInput, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }]}
+          style={[styles.searchInput, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text, fontSize: scaleFontSize(16) }]}
           placeholder={t.verseList.searchPlaceholder}
           placeholderTextColor={colors.textSecondary}
           value={searchQuery}
@@ -93,7 +95,7 @@ export const VerseListScreen: React.FC<VerseListScreenProps> = ({ onVerseSelect,
       </View>
 
       {/* Results Count */}
-      <Text style={[styles.resultsCount, { color: colors.textSecondary }]}>
+      <Text style={[styles.resultsCount, { color: colors.textSecondary, fontSize: scaleFontSize(14) }]}>
         {filteredVerses.length} {filteredVerses.length === 1 ? t.verseList.verse : t.verseList.verses} {t.verseList.versesFound}
       </Text>
 

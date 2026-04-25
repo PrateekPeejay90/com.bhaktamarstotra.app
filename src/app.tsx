@@ -7,7 +7,6 @@ import { VerseDetailScreen } from './screens/VerseDetailScreen';
 import { SamputSelectionScreen } from './screens/SamputSelectionScreen';
 import { SamputReadingScreen } from './screens/SamputReadingScreen';
 import { SearchScreen } from './screens/SearchScreen';
-import { AboutScreen } from './screens/AboutScreen';
 import { MenuDrawer } from './components/MenuDrawer';
 import { Verse } from './types';
 import { dataService } from './services/dataService';
@@ -21,8 +20,7 @@ type Screen =
   | 'verseDetail'
   | 'samputSelection'
   | 'samputReading'
-  | 'search'
-  | 'about';
+  | 'search';
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('home');
@@ -57,11 +55,6 @@ export default function App() {
 
   const navigateToSearch = () => {
     setCurrentScreen('search');
-    closeDrawer();
-  };
-
-  const navigateToAbout = () => {
-    setCurrentScreen('about');
     closeDrawer();
   };
 
@@ -129,8 +122,6 @@ export default function App() {
             onOpenDrawer={openDrawer}
           />
         );
-      case 'about':
-        return <AboutScreen onBack={navigateToHome} onOpenDrawer={openDrawer} />;
       default:
         return null;
     }
@@ -147,7 +138,6 @@ export default function App() {
               activeScreen={currentScreen}
               onClose={closeDrawer}
               onNavigateHome={navigateToHome}
-              onNavigateAbout={navigateToAbout}
             />
           </FontSizeProvider>
         </LanguageProvider>

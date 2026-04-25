@@ -3,11 +3,13 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Globe, CaretDown, CaretUp, Check } from 'phosphor-react-native';
 import { useLanguage, LanguageCode } from '../contexts/LanguageContext';
 import { useTheme } from '../contexts/ThemeContext';
+import { useFontSize } from '../contexts/FontSizeContext';
 
 export const LanguageMenu: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const { language, setLanguage, t } = useLanguage();
   const { colors } = useTheme();
+  const { scaleFontSize } = useFontSize();
 
   const languages: { code: LanguageCode; label: string; nativeLabel: string }[] = [
     { code: 'en', label: 'English', nativeLabel: 'English' },
@@ -26,10 +28,10 @@ export const LanguageMenu: React.FC = () => {
       >
         <View style={styles.headerLeft}>
           <Globe size={20} color={colors.spiritual} weight="bold" />
-          <Text style={[styles.title, { color: colors.spiritual }]}>{t.menu.language}</Text>
+          <Text style={[styles.title, { color: colors.spiritual, fontSize: scaleFontSize(16) }]}>{t.menu.language}</Text>
         </View>
         <View style={styles.headerRight}>
-          <Text style={[styles.currentLanguage, { color: colors.textSecondary }]}>
+          <Text style={[styles.currentLanguage, { color: colors.textSecondary, fontSize: scaleFontSize(14) }]}>
             {currentLanguage?.nativeLabel}
           </Text>
           {isExpanded ? (
@@ -57,7 +59,7 @@ export const LanguageMenu: React.FC = () => {
                 <Text
                   style={[
                     styles.languageLabel,
-                    { color: language === lang.code ? colors.spiritual : colors.text }
+                    { color: language === lang.code ? colors.spiritual : colors.text, fontSize: scaleFontSize(16) }
                   ]}
                 >
                   {lang.nativeLabel}
@@ -65,7 +67,7 @@ export const LanguageMenu: React.FC = () => {
                 <Text
                   style={[
                     styles.languageSubLabel,
-                    { color: language === lang.code ? colors.spiritual : colors.textSecondary }
+                    { color: language === lang.code ? colors.spiritual : colors.textSecondary, fontSize: scaleFontSize(12) }
                   ]}
                 >
                   {lang.label}

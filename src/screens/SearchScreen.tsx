@@ -9,6 +9,7 @@ import {
 import { List } from 'phosphor-react-native';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useFontSize } from '../contexts/FontSizeContext';
 import { SearchBar } from '../components/SearchBar';
 import { SearchResults } from '../components/SearchResults';
 import { BackIconButton } from '../components/BackIconButton';
@@ -28,6 +29,7 @@ export const SearchScreen: React.FC<SearchScreenProps> = ({
 }) => {
   const { colors } = useTheme();
   const { t } = useLanguage();
+  const { scaleFontSize } = useFontSize();
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [currentSearchTerm, setCurrentSearchTerm] = useState('');
   const [isSearching, setIsSearching] = useState(false);
@@ -62,25 +64,25 @@ export const SearchScreen: React.FC<SearchScreenProps> = ({
     if (!hasSearched && !isSearching) {
       return (
         <View style={styles.welcomeContainer}>
-          <Text style={[styles.welcomeTitle, { color: colors.spiritual }]}>
+          <Text style={[styles.welcomeTitle, { color: colors.spiritual, fontSize: scaleFontSize(24) }]}>
             {t.search.searchTitle}
           </Text>
-          <Text style={[styles.welcomeSubtitle, { color: colors.text }]}>
+          <Text style={[styles.welcomeSubtitle, { color: colors.text, fontSize: scaleFontSize(16), lineHeight: scaleFontSize(16) * 1.5 }]}>
             {t.search.searchSubtitle}
           </Text>
           
           <View style={styles.searchTips}>
-            <Text style={[styles.tipsTitle, { color: colors.text }]}>{t.search.tips}</Text>
-            <Text style={[styles.tipItem, { color: colors.textSecondary }]}>
+            <Text style={[styles.tipsTitle, { color: colors.text, fontSize: scaleFontSize(18) }]}>{t.search.tips}</Text>
+            <Text style={[styles.tipItem, { color: colors.textSecondary, fontSize: scaleFontSize(14), lineHeight: scaleFontSize(14) * 1.45 }]}>
               {t.search.tip1}
             </Text>
-            <Text style={[styles.tipItem, { color: colors.textSecondary }]}>
+            <Text style={[styles.tipItem, { color: colors.textSecondary, fontSize: scaleFontSize(14), lineHeight: scaleFontSize(14) * 1.45 }]}>
               {t.search.tip2}
             </Text>
-            <Text style={[styles.tipItem, { color: colors.textSecondary }]}>
+            <Text style={[styles.tipItem, { color: colors.textSecondary, fontSize: scaleFontSize(14), lineHeight: scaleFontSize(14) * 1.45 }]}>
               {t.search.tip3}
             </Text>
-            <Text style={[styles.tipItem, { color: colors.textSecondary }]}>
+            <Text style={[styles.tipItem, { color: colors.textSecondary, fontSize: scaleFontSize(14), lineHeight: scaleFontSize(14) * 1.45 }]}>
               {t.search.tip4}
             </Text>
           </View>
@@ -104,7 +106,7 @@ export const SearchScreen: React.FC<SearchScreenProps> = ({
       <View style={styles.header}>
         <BackIconButton onPress={onBack} />
         
-        <Text style={[styles.headerTitle, { color: colors.text }]}>{t.search.title}</Text>
+        <Text style={[styles.headerTitle, { color: colors.text, fontSize: scaleFontSize(20) }]}>{t.search.title}</Text>
         
         <TouchableOpacity
           style={[styles.menuButton, { backgroundColor: colors.surface, borderColor: colors.border }]}

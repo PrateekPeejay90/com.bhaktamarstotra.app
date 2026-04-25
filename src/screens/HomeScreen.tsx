@@ -5,6 +5,7 @@ import { dataService } from '../services/dataService';
 import { BhaktamarData, Verse } from '../types';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useFontSize } from '../contexts/FontSizeContext';
 
 interface HomeScreenProps {
   onStartReading: () => void;
@@ -18,6 +19,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onStartReading, onBrowse
   const [appData, setAppData] = useState<BhaktamarData | null>(null);
   const { colors } = useTheme();
   const { t } = useLanguage();
+  const { fontSizes, scaleFontSize } = useFontSize();
 
   useEffect(() => {
     const data = dataService.getAllData();
@@ -43,7 +45,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onStartReading, onBrowse
   if (!appData) {
     return (
       <View style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
-        <Text style={[styles.loadingText, { color: colors.text }]}>{t.home.loading}</Text>
+        <Text style={[styles.loadingText, { color: colors.text, fontSize: scaleFontSize(16) }]}>{t.home.loading}</Text>
       </View>
     );
   }
@@ -71,9 +73,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onStartReading, onBrowse
 
           {/* Main Title */}
           <View style={styles.titleSection}>
-          <Text style={[styles.title, { color: colors.spiritual }]}>{t.home.title}</Text>
-          <Text style={[styles.subtitle, { color: colors.spiritualLight }]}>भक्तामर स्तोत्र</Text>
-          <Text style={[styles.author, { color: colors.spiritualLight }]}>by {appData.author}</Text>
+          <Text style={[styles.title, { color: colors.spiritual, fontSize: scaleFontSize(28) }]}>{t.home.title}</Text>
+          <Text style={[styles.subtitle, { color: colors.spiritualLight, fontSize: fontSizes.sanskrit }]}>भक्तामर स्तोत्र</Text>
+          <Text style={[styles.author, { color: colors.spiritualLight, fontSize: scaleFontSize(16) }]}>by {appData.author}</Text>
         </View>
 
         {/* Action Buttons */}
@@ -82,21 +84,21 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onStartReading, onBrowse
             style={[styles.button, { backgroundColor: colors.button }]}
             onPress={handleStartReading}
           >
-            <Text style={[styles.primaryButtonText, { color: colors.buttonText }]}>{t.home.startReading}</Text>
+            <Text style={[styles.primaryButtonText, { color: colors.buttonText, fontSize: scaleFontSize(18) }]}>{t.home.startReading}</Text>
           </TouchableOpacity>
           
           <TouchableOpacity 
             style={[styles.button, styles.secondaryButton, { borderColor: colors.spiritual }]}
             onPress={handleBrowseVerses}
           >
-            <Text style={[styles.secondaryButtonText, { color: colors.spiritual }]}>{t.home.browseVerses}</Text>
+            <Text style={[styles.secondaryButtonText, { color: colors.spiritual, fontSize: scaleFontSize(18) }]}>{t.home.browseVerses}</Text>
           </TouchableOpacity>
           
           <TouchableOpacity 
             style={[styles.button, styles.samputButton, { backgroundColor: colors.accent, borderColor: colors.spiritual }]}
             onPress={handleSamputt}
           >
-            <Text style={[styles.samputButtonText, { color: colors.spiritual }]}>{t.home.samputReading}</Text>
+            <Text style={[styles.samputButtonText, { color: colors.spiritual, fontSize: scaleFontSize(18) }]}>{t.home.samputReading}</Text>
           </TouchableOpacity>
         </View>
       </View>

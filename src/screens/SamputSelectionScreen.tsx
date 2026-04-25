@@ -14,6 +14,7 @@ import { List } from 'phosphor-react-native';
 import { dataService } from '../services/dataService';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useFontSize } from '../contexts/FontSizeContext';
 import { BackIconButton } from '../components/BackIconButton';
 
 interface SamputSelectionScreenProps {
@@ -29,6 +30,7 @@ export const SamputSelectionScreen: React.FC<SamputSelectionScreenProps> = ({
 }) => {
   const { colors } = useTheme();
   const { t } = useLanguage();
+  const { fontSizes, scaleFontSize } = useFontSize();
   const [selectedVerse, setSelectedVerse] = useState<string>('');
   const totalVerses = dataService.getTotalVerses();
 
@@ -60,7 +62,7 @@ export const SamputSelectionScreen: React.FC<SamputSelectionScreenProps> = ({
     
     return (
       <View style={styles.quickSelectContainer}>
-        <Text style={[styles.quickSelectLabel, { color: colors.text }]}>{t.samputt.quickSelect}:</Text>
+        <Text style={[styles.quickSelectLabel, { color: colors.text, fontSize: scaleFontSize(16) }]}>{t.samputt.quickSelect}:</Text>
         <View style={styles.quickSelectButtons}>
           {popularVerses.map((verse) => (
             <TouchableOpacity
@@ -74,7 +76,7 @@ export const SamputSelectionScreen: React.FC<SamputSelectionScreenProps> = ({
             >
               <Text style={[
                 styles.quickSelectButtonText,
-                { color: selectedVerse === verse.toString() ? colors.buttonText : colors.textSecondary },
+                { color: selectedVerse === verse.toString() ? colors.buttonText : colors.textSecondary, fontSize: scaleFontSize(16) },
                 selectedVerse === verse.toString() && { color: colors.buttonText }
               ]}>
                 {verse}
@@ -92,7 +94,7 @@ export const SamputSelectionScreen: React.FC<SamputSelectionScreenProps> = ({
         {/* Header */}
         <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
           <BackIconButton onPress={onBack} />
-          <Text style={[styles.headerTitle, { color: colors.spiritual }]}>{t.samputt.title}</Text>
+          <Text style={[styles.headerTitle, { color: colors.spiritual, fontSize: scaleFontSize(20) }]}>{t.samputt.title}</Text>
           <TouchableOpacity 
             style={[styles.menuButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
             onPress={onOpenDrawer}
@@ -103,27 +105,27 @@ export const SamputSelectionScreen: React.FC<SamputSelectionScreenProps> = ({
 
         {/* Explanation */}
         <View style={[styles.explanationContainer, { backgroundColor: colors.surface }]}>
-          <Text style={[styles.explanationTitle, { color: colors.spiritual }]}>{t.samputt.whatIs}</Text>
-          <Text style={[styles.explanationText, { color: colors.text }]}>
+          <Text style={[styles.explanationTitle, { color: colors.spiritual, fontSize: scaleFontSize(18) }]}>{t.samputt.whatIs}</Text>
+          <Text style={[styles.explanationText, { color: colors.text, fontSize: scaleFontSize(16), lineHeight: scaleFontSize(16) * 1.5 }]}>
             {t.samputt.description}
           </Text>
           
-          <Text style={[styles.exampleTitle, { color: colors.spiritual }]}>Example Pattern:</Text>
-          <Text style={[styles.exampleText, { color: colors.textSecondary }]}>
+          <Text style={[styles.exampleTitle, { color: colors.spiritual, fontSize: scaleFontSize(16) }]}>Example Pattern:</Text>
+          <Text style={[styles.exampleText, { color: colors.textSecondary, fontSize: scaleFontSize(14), lineHeight: scaleFontSize(14) * 1.45 }]}>
             Select verse 20 → Pattern: 1→20→2→20→3→20...→48→20
           </Text>
         </View>
 
         {/* Verse Selection */}
         <View style={[styles.selectionContainer, { backgroundColor: colors.surface }]}>
-          <Text style={[styles.selectionTitle, { color: colors.spiritual }]}>{t.samputt.selectVerse}</Text>
-          <Text style={[styles.selectionSubtitle, { color: colors.textSecondary }]}>
+          <Text style={[styles.selectionTitle, { color: colors.spiritual, fontSize: scaleFontSize(18) }]}>{t.samputt.selectVerse}</Text>
+          <Text style={[styles.selectionSubtitle, { color: colors.textSecondary, fontSize: scaleFontSize(14) }]}>
             Choose a verse number (1 to {totalVerses})
           </Text>
 
           <View style={styles.inputContainer}>
             <TextInput
-              style={[styles.verseInput, { backgroundColor: colors.accent, borderColor: colors.spiritual, color: colors.spiritual }]}
+              style={[styles.verseInput, { backgroundColor: colors.accent, borderColor: colors.spiritual, color: colors.spiritual, fontSize: scaleFontSize(18) }]}
               value={selectedVerse}
               onChangeText={handleVerseSelection}
               placeholder={t.samputt.enterNumber}
@@ -140,10 +142,10 @@ export const SamputSelectionScreen: React.FC<SamputSelectionScreenProps> = ({
         {selectedVerse && !isNaN(parseInt(selectedVerse)) && 
          parseInt(selectedVerse) >= 1 && parseInt(selectedVerse) <= totalVerses && (
           <View style={[styles.previewContainer, { backgroundColor: colors.surface }]}>
-            <Text style={[styles.previewTitle, { color: colors.spiritual }]}>Selected Verse Preview:</Text>
+            <Text style={[styles.previewTitle, { color: colors.spiritual, fontSize: scaleFontSize(16) }]}>Selected Verse Preview:</Text>
             <View style={[styles.previewCard, { backgroundColor: colors.accent, borderLeftColor: colors.spiritual }]}>
-              <Text style={[styles.previewVerseNumber, { color: colors.spiritual }]}>Verse {selectedVerse}</Text>
-              <Text style={[styles.previewContent, { color: colors.text }]}>
+              <Text style={[styles.previewVerseNumber, { color: colors.spiritual, fontSize: fontSizes.labels }]}>Verse {selectedVerse}</Text>
+              <Text style={[styles.previewContent, { color: colors.text, fontSize: fontSizes.sanskrit, lineHeight: fontSizes.sanskrit * 1.45 }]}>
                 {dataService.getVerseByNumber(parseInt(selectedVerse))?.content.split('\n')[0]}...
               </Text>
             </View>
@@ -162,7 +164,7 @@ export const SamputSelectionScreen: React.FC<SamputSelectionScreenProps> = ({
         >
           <Text style={[
             styles.startButtonText,
-            { color: selectedVerse ? colors.buttonText : colors.textSecondary },
+            { color: selectedVerse ? colors.buttonText : colors.textSecondary, fontSize: scaleFontSize(18) },
             !selectedVerse && styles.disabledButtonText
           ]}>
             {t.samputt.start}

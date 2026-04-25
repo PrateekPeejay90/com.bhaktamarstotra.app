@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useFontSize } from '../contexts/FontSizeContext';
 import { SearchResult } from '../services/searchService';
 import { Verse } from '../types';
 
@@ -63,6 +64,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
 }) => {
   const { colors } = useTheme();
   const { t } = useLanguage();
+  const { fontSizes, scaleFontSize } = useFontSize();
 
   const getFieldDisplayName = (fieldName: string): string => {
     switch (fieldName) {
@@ -85,11 +87,11 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
       >
         {/* Verse Header */}
         <View style={styles.resultHeader}>
-          <Text style={[styles.verseNumber, { color: colors.spiritual }]}>
+          <Text style={[styles.verseNumber, { color: colors.spiritual, fontSize: scaleFontSize(16) }]}>
             Verse {verse.verse_number}
           </Text>
           <View style={styles.relevanceContainer}>
-            <Text style={[styles.relevanceScore, { color: colors.textSecondary }]}>
+            <Text style={[styles.relevanceScore, { color: colors.textSecondary, fontSize: scaleFontSize(12) }]}>
               {Math.round(relevanceScore)}% match
             </Text>
           </View>
@@ -102,7 +104,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
               key={index}
               style={[styles.fieldTag, { backgroundColor: colors.accent, borderColor: colors.spiritual }]}
             >
-              <Text style={[styles.fieldTagText, { color: colors.spiritual }]}>
+              <Text style={[styles.fieldTagText, { color: colors.spiritual, fontSize: scaleFontSize(11) }]}>
                 {getFieldDisplayName(field)}
               </Text>
             </View>
@@ -115,7 +117,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
             <HighlightedText
               text={verse.content}
               searchTerm={searchTerm}
-              style={[styles.sanskritText, { color: colors.text }]}
+              style={[styles.sanskritText, { color: colors.text, fontSize: fontSizes.sanskrit, lineHeight: fontSizes.sanskrit * 1.5 }]}
               highlightStyle={[styles.highlightText, { backgroundColor: colors.accent, color: colors.spiritual }]}
             />
           </View>
@@ -127,7 +129,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
             <HighlightedText
               text={verse.transliteration}
               searchTerm={searchTerm}
-              style={[styles.transliterationText, { color: colors.textSecondary }]}
+              style={[styles.transliterationText, { color: colors.textSecondary, fontSize: fontSizes.transliteration, lineHeight: fontSizes.transliteration * 1.45 }]}
               highlightStyle={[styles.highlightText, { backgroundColor: colors.accent, color: colors.spiritual }]}
             />
           </View>
@@ -142,7 +144,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
                 : verse.english_meaning.substring(0, 120) + (verse.english_meaning.length > 120 ? '...' : '')
               }
               searchTerm={searchTerm}
-              style={[styles.meaningText, { color: colors.text }]}
+              style={[styles.meaningText, { color: colors.text, fontSize: fontSizes.english, lineHeight: fontSizes.english * 1.45 }]}
               highlightStyle={[styles.highlightText, { backgroundColor: colors.accent, color: colors.spiritual }]}
             />
           </View>
@@ -154,14 +156,14 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
             <HighlightedText
               text={verse.hindi_meaning}
               searchTerm={searchTerm}
-              style={[styles.meaningText, { color: colors.text }]}
+              style={[styles.meaningText, { color: colors.text, fontSize: fontSizes.hindi, lineHeight: fontSizes.hindi * 1.45 }]}
               highlightStyle={[styles.highlightText, { backgroundColor: colors.accent, color: colors.spiritual }]}
             />
           </View>
         )}
 
         {/* Tap to view indicator */}
-        <Text style={[styles.tapToView, { color: colors.textSecondary }]}>
+        <Text style={[styles.tapToView, { color: colors.textSecondary, fontSize: scaleFontSize(12) }]}>
           {t.search.tapToView}
         </Text>
       </TouchableOpacity>
@@ -171,7 +173,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <Text style={[styles.loadingText, { color: colors.text }]}>{t.search.searching}</Text>
+        <Text style={[styles.loadingText, { color: colors.text, fontSize: scaleFontSize(16) }]}>{t.search.searching}</Text>
       </View>
     );
   }
@@ -179,8 +181,8 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
   if (results.length === 0) {
     return (
       <View style={styles.emptyContainer}>
-        <Text style={[styles.emptyTitle, { color: colors.text }]}>{t.search.noResults}</Text>
-        <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
+        <Text style={[styles.emptyTitle, { color: colors.text, fontSize: scaleFontSize(18) }]}>{t.search.noResults}</Text>
+        <Text style={[styles.emptySubtitle, { color: colors.textSecondary, fontSize: scaleFontSize(14), lineHeight: scaleFontSize(14) * 1.45 }]}>
           {t.search.tip4}
         </Text>
       </View>
@@ -190,10 +192,10 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
   return (
     <View style={styles.container}>
       <View style={styles.resultsHeader}>
-        <Text style={[styles.resultsCount, { color: colors.text }]}>
+        <Text style={[styles.resultsCount, { color: colors.text, fontSize: scaleFontSize(16) }]}>
           {results.length} {results.length === 1 ? t.verseList.verse : t.verseList.verses} {t.verseList.versesFound}
         </Text>
-        <Text style={[styles.searchTerm, { color: colors.spiritual }]}>
+        <Text style={[styles.searchTerm, { color: colors.spiritual, fontSize: scaleFontSize(14) }]}>
           {t.search.resultsFor} "{searchTerm}"
         </Text>
       </View>

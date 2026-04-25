@@ -23,7 +23,7 @@ npm run typecheck
 
 ## Project Structure
 
-- `src/screens/`: app screens including the new About and Privacy screen
+- `src/screens/`: app screens for home, verse browsing, search, and Samputt reading
 - `src/components/`: reusable UI for menus, search, and results
 - `src/contexts/`: theme, language, and font-size state
 - `assets/data.json`: local Bhaktamar Stotra data
@@ -37,10 +37,12 @@ See [docs/LOCAL_TESTING.md](docs/LOCAL_TESTING.md) for emulator, USB device, Wi-
 ## Android Release
 
 See [docs/ANDROID_RELEASE.md](docs/ANDROID_RELEASE.md) for bundle signing, Play App Signing, and production AAB creation.
+See [docs/RELEASE_KEYSTORE.md](docs/RELEASE_KEYSTORE.md) for creating the local upload keystore.
 
 ## Google Play Compliance
 
 See [docs/PLAY_STORE_CHECKLIST.md](docs/PLAY_STORE_CHECKLIST.md) for the store listing and policy checklist.
+See [docs/STORE_LISTING.md](docs/STORE_LISTING.md) for suggested Play Console listing text and declaration answers.
 
 ## Theme Notes
 
@@ -53,6 +55,6 @@ The app now uses a shared Material 3-style color system centered on these pairin
 
 ## Remaining Manual Steps
 
-- Replace the placeholder contact details inside `public/privacy-policy.html`
-- Export real high-resolution store assets for `assets/icon.png`, `assets/adaptive-icon.png`, `assets/splash.png`, and `assets/favicon.png`
+- Host `public/privacy-policy.html` at a public URL and enter it in Play Console
+- Export Play Store graphics, including a `512x512` icon, `1024x500` feature graphic, and phone screenshots
 - Configure the Android release keystore outside the repository before shipping to Google Play

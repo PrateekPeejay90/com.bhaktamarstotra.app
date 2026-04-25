@@ -9,6 +9,7 @@ interface FontSizeSettings {
   hindi: number;
   english: number;
   labels: number;
+  uiScale: number;
 }
 
 interface FontSizeContextType {
@@ -17,6 +18,7 @@ interface FontSizeContextType {
   increaseFontSize: () => void;
   decreaseFontSize: () => void;
   setFontSizeLevel: (level: FontSizeLevel) => void;
+  scaleFontSize: (baseSize: number) => number;
 }
 
 const fontSizePresets: Record<FontSizeLevel, FontSizeSettings> = {
@@ -26,6 +28,7 @@ const fontSizePresets: Record<FontSizeLevel, FontSizeSettings> = {
     hindi: 14,
     english: 14,
     labels: 12,
+    uiScale: 0.9,
   },
   'medium': {
     sanskrit: 18,
@@ -33,6 +36,7 @@ const fontSizePresets: Record<FontSizeLevel, FontSizeSettings> = {
     hindi: 16,
     english: 16,
     labels: 14,
+    uiScale: 1,
   },
   'large': {
     sanskrit: 20,
@@ -40,6 +44,7 @@ const fontSizePresets: Record<FontSizeLevel, FontSizeSettings> = {
     hindi: 18,
     english: 18,
     labels: 16,
+    uiScale: 1.12,
   },
   'extra-large': {
     sanskrit: 24,
@@ -47,6 +52,7 @@ const fontSizePresets: Record<FontSizeLevel, FontSizeSettings> = {
     hindi: 20,
     english: 20,
     labels: 18,
+    uiScale: 1.25,
   },
 };
 
@@ -85,6 +91,7 @@ export const FontSizeProvider: React.FC<FontSizeProviderProps> = ({ children }) 
   };
 
   const fontSizes = fontSizePresets[currentLevel];
+  const scaleFontSize = (baseSize: number) => Math.round(baseSize * fontSizes.uiScale);
 
   const increaseFontSize = () => {
     const levels: FontSizeLevel[] = ['small', 'medium', 'large', 'extra-large'];
@@ -117,6 +124,7 @@ export const FontSizeProvider: React.FC<FontSizeProviderProps> = ({ children }) 
     increaseFontSize,
     decreaseFontSize,
     setFontSizeLevel,
+    scaleFontSize,
   };
 
   return (
