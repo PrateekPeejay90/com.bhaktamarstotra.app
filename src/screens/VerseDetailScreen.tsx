@@ -7,14 +7,13 @@ import {
   ScrollView,
   SafeAreaView 
 } from 'react-native';
-import { List } from 'phosphor-react-native';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { dataService } from '../services/dataService';
 import { Verse } from '../types';
 import { useFontSize } from '../contexts/FontSizeContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
-import { BackIconButton } from '../components/BackIconButton';
+import { ScreenHeader } from '../components/ScreenHeader';
 
 interface VerseDetailScreenProps {
   verse: Verse;
@@ -30,7 +29,6 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
   onOpenDrawer 
 }) => {
   const [currentVerse, setCurrentVerse] = useState<Verse>(verse);
-  const [isBookmarked, setIsBookmarked] = useState(false);
   
   // Use font size context and theme
   const { fontSizes, scaleFontSize } = useFontSize();
@@ -58,11 +56,6 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
     }
   };
 
-  const toggleBookmark = () => {
-    setIsBookmarked(!isBookmarked);
-    // TODO: Implement bookmark persistence
-  };
-
   // Swipe gesture handler
   const onSwipeGesture = (event: any) => {
     const { translationX, state } = event.nativeEvent;
@@ -82,37 +75,20 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Header */}
-      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-        <BackIconButton onPress={onBack} />
-        
-        <View style={styles.headerCenter}>
-          <Text style={[styles.verseTitle, { color: colors.spiritual, fontSize: scaleFontSize(18) }]}>{t.verseDetail.verse} {currentVerse.verse_number}</Text>
-          <Text style={[styles.pageInfo, { color: colors.textSecondary, fontSize: scaleFontSize(12) }]}>{t.verseDetail.page} {currentVerse.page_number}</Text>
-        </View>
-        
-        <View style={styles.headerRight}>
-          <TouchableOpacity style={[styles.bookmarkButton, { backgroundColor: colors.accent }]} onPress={toggleBookmark}>
-            <Text style={[styles.bookmarkText, { color: colors.spiritual, fontSize: scaleFontSize(24) }]}>{isBookmarked ? '★' : '☆'}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={[styles.menuButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
-            onPress={onOpenDrawer}
-          >
-            <List size={20} color={colors.spiritual} weight="bold" />
-          </TouchableOpacity>
-        </View>
-      </View>
+      <ScreenHeader
+        title={`${t.verseDetail.verse} ${currentVerse.verse_number}`}
+        subtitle={`${t.verseDetail.page} ${currentVerse.page_number}`}
+        onBack={onBack}
+        onOpenDrawer={onOpenDrawer}
+        titleFontSize={scaleFontSize(18)}
+        subtitleFontSize={scaleFontSize(12)}
+      />
 
       {/* Verse Content */}
       <View style={styles.contentArea}>
         <PanGestureHandler onGestureEvent={onSwipeGesture}>
-          <ScrollView
-            style={[styles.contentContainer, { backgroundColor: colors.background }]}
-            contentContainerStyle={styles.contentScrollContent}
-            showsVerticalScrollIndicator={false}
-          >
-            <View style={[styles.verseContent, { backgroundColor: colors.surface }]}>
+          <View style={styles.readingLayout}>
+            <View style={[styles.verseContent, styles.fixedVerseCard, { backgroundColor: colors.surface }]}>
               <View>
                 {currentVerse.content.split('\n').map((line, index) => (
                   <Text
@@ -132,67 +108,73 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
               </View>
             </View>
 
-            <View style={styles.translationsContainer}>
-              <View style={styles.translationSection}>
-                <Text style={[styles.translationLabel, { fontSize: fontSizes.labels, color: colors.spiritual }]}>
-                  Transliteration:
-                </Text>
-                <View>
-                  {currentVerse.transliteration.split('\n').map((line, index) => (
-                    <Text
-                      key={index}
-                      style={[
-                        styles.transliterationText,
-                        {
-                          fontSize: fontSizes.transliteration,
-                          lineHeight: fontSizes.transliteration * 1.5,
-                          color: colors.text,
-                        },
-                      ]}
-                    >
-                      {line}
-                    </Text>
-                  ))}
+            <ScrollView
+              style={[styles.detailsScrollView, { backgroundColor: colors.background }]}
+              contentContainerStyle={styles.detailsScrollContent}
+              showsVerticalScrollIndicator={false}
+            >
+              <View style={styles.translationsContainer}>
+                <View style={styles.translationSection}>
+                  <Text style={[styles.translationLabel, { fontSize: fontSizes.labels, color: colors.spiritual }]}>
+                    {t.verseDetail.transliteration}:
+                  </Text>
+                  <View>
+                    {currentVerse.transliteration.split('\n').map((line, index) => (
+                      <Text
+                        key={index}
+                        style={[
+                          styles.transliterationText,
+                          {
+                            fontSize: fontSizes.transliteration,
+                            lineHeight: fontSizes.transliteration * 1.5,
+                            color: colors.text,
+                          },
+                        ]}
+                      >
+                        {line}
+                      </Text>
+                    ))}
+                  </View>
+                </View>
+                
+                <View style={styles.translationSection}>
+                  <Text style={[styles.translationLabel, { fontSize: fontSizes.labels, color: colors.spiritual }]}>
+                    {t.verseDetail.hindi}:
+                  </Text>
+                  <Text
+                    style={[
+                      styles.hindiText,
+                      {
+                        fontSize: fontSizes.hindi,
+                        lineHeight: fontSizes.hindi * 1.5,
+                        color: colors.text,
+                      },
+                    ]}
+                  >
+                    {currentVerse.hindi_meaning}
+                  </Text>
+                </View>
+                
+                <View style={styles.translationSection}>
+                  <Text style={[styles.translationLabel, { fontSize: fontSizes.labels, color: colors.spiritual }]}>
+                    {t.verseDetail.english}:
+                  </Text>
+                  <Text
+                    style={[
+                      styles.englishText,
+                      {
+                        fontSize: fontSizes.english,
+                        lineHeight: fontSizes.english * 1.5,
+                        color: colors.text,
+                      },
+                    ]}
+                  >
+                    {currentVerse.english_meaning}
+                  </Text>
                 </View>
               </View>
-              
-              <View style={styles.translationSection}>
-                <Text style={[styles.translationLabel, { fontSize: fontSizes.labels, color: colors.spiritual }]}>
-                  Hindi Meaning:
-                </Text>
-                <Text
-                  style={[
-                    styles.hindiText,
-                    {
-                      fontSize: fontSizes.hindi,
-                      lineHeight: fontSizes.hindi * 1.5,
-                      color: colors.text,
-                    },
-                  ]}
-                >
-                  {currentVerse.hindi_meaning}
-                </Text>
-              </View>
-              
-              <View style={styles.translationSection}>
-                <Text style={[styles.translationLabel, { fontSize: fontSizes.labels, color: colors.spiritual }]}>
-                  English Meaning:
-                </Text>
-                <Text
-                  style={[
-                    styles.englishText,
-                    {
-                      fontSize: fontSizes.english,
-                      lineHeight: fontSizes.english * 1.5,
-                      color: colors.text,
-                    },
-                  ]}
-                >
-                  {currentVerse.english_meaning}
-                </Text>
-              </View>
-            </View>
-          </ScrollView>
+            </ScrollView>
+          </View>
         </PanGestureHandler>
       </View>
 
@@ -212,13 +194,13 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
             { color: canGoPrevious ? colors.buttonText : colors.textSecondary, fontSize: scaleFontSize(16) },
             !canGoPrevious && styles.disabledNavButtonText
           ]}>
-            ← Previous
+            ← {t.navigation.previous}
           </Text>
         </TouchableOpacity>
 
         <View style={styles.progressContainer}>
           <Text style={[styles.progressText, { color: colors.text, fontSize: scaleFontSize(14) }]}>
-            {currentVerse.verse_number} of {totalVerses}
+            {currentVerse.verse_number} / {totalVerses}
           </Text>
         </View>
 
@@ -236,7 +218,7 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
             { color: canGoNext ? colors.buttonText : colors.textSecondary, fontSize: scaleFontSize(16) },
             !canGoNext && styles.disabledNavButtonText
           ]}>
-            Next →
+            {t.navigation.next} →
           </Text>
         </TouchableOpacity>
       </View>
@@ -249,60 +231,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f8f6f0',
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#ffffff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  headerCenter: {
-    alignItems: 'center',
-    flex: 1,
-  },
-  verseTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#8B4513',
-  },
-  pageInfo: {
-    fontSize: 12,
-    color: '#999999',
-    marginTop: 2,
-  },
-  headerRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  bookmarkButton: {
-    padding: 8,
-  },
-  bookmarkText: {
-    fontSize: 24,
-    color: '#8B4513',
-  },
-  menuButton: {
-    padding: 8,
-    borderRadius: 10,
-    borderWidth: 1,
-  },
   contentArea: {
     flex: 1,
+    minHeight: 0,
   },
-  contentContainer: {
+  readingLayout: {
     flex: 1,
+    minHeight: 0,
   },
-  contentScrollContent: {
-    paddingBottom: 16,
+  fixedVerseCard: {
+    flexShrink: 0,
+    marginBottom: 12,
   },
   verseContent: {
     padding: 20,
     backgroundColor: '#ffffff',
-    margin: 16,
+    marginTop: 16,
+    marginHorizontal: 16,
     borderRadius: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -336,8 +281,16 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     textAlign: 'justify',
   },
+  detailsScrollView: {
+    flex: 1,
+    minHeight: 0,
+  },
+  detailsScrollContent: {
+    paddingTop: 4,
+    paddingBottom: 16,
+  },
   translationsContainer: {
-    margin: 16,
+    paddingHorizontal: 16,
     gap: 16,
   },
   translationSection: {

@@ -22,6 +22,5 @@ export type Language = 'sanskrit' | 'hindi' | 'english' | 'transliteration';
 export interface AppState {
   currentVerse: number;
   selectedLanguage: Language;
-  bookmarkedVerses: number[];
   searchQuery: string;
 }

@@ -5,6 +5,8 @@ import {
   TouchableOpacity,
   FlatList,
   StyleSheet,
+  StyleProp,
+  TextStyle,
 } from 'react-native';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -22,8 +24,8 @@ interface SearchResultsProps {
 interface HighlightedTextProps {
   text: string;
   searchTerm: string;
-  style: any;
-  highlightStyle: any;
+  style: StyleProp<TextStyle>;
+  highlightStyle: StyleProp<TextStyle>;
 }
 
 const HighlightedText: React.FC<HighlightedTextProps> = ({
@@ -36,13 +38,15 @@ const HighlightedText: React.FC<HighlightedTextProps> = ({
     return <Text style={style}>{text}</Text>;
   }
 
-  const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+  const normalizedSearchTerm = searchTerm.trim().toLowerCase();
+  const escapedSearchTerm = searchTerm.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const regex = new RegExp(`(${escapedSearchTerm})`, 'gi');
   const parts = text.split(regex);
 
   return (
     <Text style={style}>
       {parts.map((part, index) => {
-        const isHighlight = regex.test(part);
+        const isHighlight = part.toLowerCase() === normalizedSearchTerm;
         return (
           <Text
             key={index}
@@ -88,11 +92,11 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
         {/* Verse Header */}
         <View style={styles.resultHeader}>
           <Text style={[styles.verseNumber, { color: colors.spiritual, fontSize: scaleFontSize(16) }]}>
-            Verse {verse.verse_number}
+            {t.verseDetail.verse} {verse.verse_number}
           </Text>
           <View style={styles.relevanceContainer}>
             <Text style={[styles.relevanceScore, { color: colors.textSecondary, fontSize: scaleFontSize(12) }]}>
-              {Math.round(relevanceScore)}% match
+              {Math.round(relevanceScore)}% {t.search.match}
             </Text>
           </View>
         </View>

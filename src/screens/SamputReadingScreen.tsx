@@ -7,14 +7,13 @@ import {
   ScrollView,
   SafeAreaView
 } from 'react-native';
-import { List } from 'phosphor-react-native';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { dataService } from '../services/dataService';
 import { Verse } from '../types';
 import { useFontSize } from '../contexts/FontSizeContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
-import { BackIconButton } from '../components/BackIconButton';
+import { ScreenHeader } from '../components/ScreenHeader';
 
 interface SamputReadingScreenProps {
   samputVerseNumber: number;
@@ -133,22 +132,14 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Header */}
-      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-        <BackIconButton onPress={onBack} />
-        
-        <View style={styles.headerCenter}>
-          <Text style={[styles.headerTitle, { color: colors.spiritual, fontSize: scaleFontSize(18) }]}>{t.samputt.title}</Text>
-          <Text style={[styles.headerSubtitle, { color: colors.textSecondary, fontSize: scaleFontSize(12) }]}>{t.samputt.with} {samputVerseNumber}</Text>
-        </View>
-        
-        <TouchableOpacity 
-          style={[styles.menuButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
-          onPress={onOpenDrawer}
-        >
-          <List size={20} color={colors.spiritual} weight="bold" />
-        </TouchableOpacity>
-      </View>
+      <ScreenHeader
+        title={t.samputt.title}
+        subtitle={`${t.samputt.with} ${samputVerseNumber}`}
+        onBack={onBack}
+        onOpenDrawer={onOpenDrawer}
+        titleFontSize={scaleFontSize(18)}
+        subtitleFontSize={scaleFontSize(12)}
+      />
 
       {/* Verse Type Indicator */}
       <View style={[
@@ -221,7 +212,7 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
 
               <View style={styles.meaningContainer}>
                 <Text style={[styles.sectionLabel, { fontSize: fontSizes.labels, color: colors.spiritual }]}>
-                  Hindi Meaning:
+                  {t.verseDetail.hindi}:
                 </Text>
                 <Text
                   style={[
@@ -239,7 +230,7 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
 
               <View style={styles.meaningContainer}>
                 <Text style={[styles.sectionLabel, { fontSize: fontSizes.labels, color: colors.spiritual }]}>
-                  English Meaning:
+                  {t.verseDetail.english}:
                 </Text>
                 <Text
                   style={[
@@ -275,13 +266,13 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
             { color: canGoPrevious ? colors.buttonText : colors.textSecondary, fontSize: scaleFontSize(16) },
             !canGoPrevious && styles.disabledNavButtonText
           ]}>
-            Previous
+            {t.navigation.previous}
           </Text>
         </TouchableOpacity>
 
         <View style={styles.progressContainer}>
           <Text style={[styles.progressText, { color: colors.text, fontSize: scaleFontSize(14) }]}>
-            {currentIndex + 1} {t.samputt.of} {samputSequence.length}
+            {currentIndex + 1} / {samputSequence.length}
           </Text>
           <Text style={[styles.progressSubtext, { color: colors.textSecondary, fontSize: scaleFontSize(12) }]}>
             {getVerseTypeLabel()}
@@ -302,7 +293,7 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
             { color: canGoNext ? colors.buttonText : colors.textSecondary, fontSize: scaleFontSize(16) },
             !canGoNext && styles.disabledNavButtonText
           ]}>
-            Next
+            {t.navigation.next}
           </Text>
         </TouchableOpacity>
       </View>
@@ -323,35 +314,6 @@ const styles = StyleSheet.create({
   loadingText: {
     fontSize: 18,
     color: '#8B4513',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#ffffff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  headerCenter: {
-    alignItems: 'center',
-    flex: 1,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#8B4513',
-  },
-  headerSubtitle: {
-    fontSize: 12,
-    color: '#999999',
-    marginTop: 2,
-  },
-  menuButton: {
-    padding: 8,
-    borderRadius: 10,
-    borderWidth: 1,
   },
   verseTypeContainer: {
     backgroundColor: '#E6F3FF',

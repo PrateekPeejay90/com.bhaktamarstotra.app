@@ -19,6 +19,13 @@ export interface SearchOptions {
 }
 
 class SearchService {
+  private readonly fieldWeightMap: Partial<Record<keyof Verse, number>> = {
+    content: 10,
+    english_meaning: 8,
+    hindi_meaning: 6,
+    transliteration: 4,
+  };
+
   private normalizeText(text: string, caseSensitive: boolean = false): string {
     let normalized = text.trim();
     if (!caseSensitive) {
@@ -32,7 +39,7 @@ class SearchService {
   private calculateRelevanceScore(
     searchTerm: string,
     matchedText: string,
-    fieldType: string
+    fieldName: keyof Verse
   ): number {
     const term = searchTerm.toLowerCase();
     const text = matchedText.toLowerCase();
@@ -52,21 +59,7 @@ class SearchService {
       score += 50;
     }
     
-    // Boost score based on field type priority
-    switch (fieldType) {
-      case 'sanskrit':
-        score += 10;
-        break;
-      case 'english':
-        score += 8;
-        break;
-      case 'hindi':
-        score += 6;
-        break;
-      case 'transliteration':
-        score += 4;
-        break;
-    }
+    score += this.fieldWeightMap[fieldName] ?? 0;
     
     // Boost score for shorter matches (more specific)
     const lengthRatio = term.length / text.length;
@@ -97,7 +90,7 @@ class SearchService {
     }
 
     const score = matched 
-      ? this.calculateRelevanceScore(normalizedTerm, normalizedField, fieldName as string)
+      ? this.calculateRelevanceScore(normalizedTerm, normalizedField, fieldName)
       : 0;
 
     return { matched, text: fieldValue, score };

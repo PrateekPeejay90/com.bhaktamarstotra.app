@@ -8,7 +8,8 @@
     "web": "webpack serve --config webpack.config.js --mode development",
     "build:web": "webpack --config webpack.config.js --mode production && mkdir -p dist && cp public/privacy-policy.html dist/privacy-policy.html",
     "bundle:android": "cd android && ./gradlew bundleRelease",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "verify": "npm run typecheck && npm run build:web"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^2.2.0",

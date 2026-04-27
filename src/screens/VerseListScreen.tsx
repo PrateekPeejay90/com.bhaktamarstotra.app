@@ -8,13 +8,13 @@ import {
   TextInput,
   SafeAreaView 
 } from 'react-native';
-import { List } from 'phosphor-react-native';
 import { dataService } from '../services/dataService';
+import { searchService } from '../services/searchService';
 import { Verse } from '../types';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useFontSize } from '../contexts/FontSizeContext';
-import { BackIconButton } from '../components/BackIconButton';
+import { ScreenHeader } from '../components/ScreenHeader';
 
 interface VerseListScreenProps {
   onVerseSelect: (verse: Verse) => void;
@@ -40,8 +40,8 @@ export const VerseListScreen: React.FC<VerseListScreenProps> = ({ onVerseSelect,
     if (searchQuery.trim() === '') {
       setFilteredVerses(verses);
     } else {
-      const filtered = dataService.searchVerses(searchQuery);
-      setFilteredVerses(filtered.filter(v => v.type === 'verse'));
+      const results = searchService.searchVerses(searchQuery);
+      setFilteredVerses(results.map((result) => result.verse));
     }
   }, [searchQuery, verses]);
 
@@ -71,17 +71,12 @@ export const VerseListScreen: React.FC<VerseListScreenProps> = ({ onVerseSelect,
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Header */}
-      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-        <BackIconButton onPress={onBack} />
-        <Text style={[styles.headerTitle, { color: colors.spiritual, fontSize: scaleFontSize(18) }]}>{t.verseList.title}</Text>
-        <TouchableOpacity 
-          style={[styles.menuButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
-          onPress={onOpenDrawer}
-        >
-          <List size={20} color={colors.spiritual} weight="bold" />
-        </TouchableOpacity>
-      </View>
+      <ScreenHeader
+        title={t.verseList.title}
+        onBack={onBack}
+        onOpenDrawer={onOpenDrawer}
+        titleFontSize={scaleFontSize(18)}
+      />
 
       {/* Search Bar */}
       <View style={styles.searchContainer}>
@@ -115,28 +110,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f8f6f0',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#ffffff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#8B4513',
-    flex: 1,
-    textAlign: 'center',
-  },
-  menuButton: {
-    padding: 8,
-    borderRadius: 10,
-    borderWidth: 1,
   },
   searchContainer: {
     padding: 16,

@@ -35,16 +35,33 @@ export const MenuDrawer: React.FC<MenuDrawerProps> = ({
   const { t } = useLanguage();
   const { scaleFontSize } = useFontSize();
   const slideAnim = React.useRef(new Animated.Value(-DRAWER_WIDTH)).current;
+  const [isMounted, setIsMounted] = React.useState(visible);
 
   React.useEffect(() => {
-    Animated.timing(slideAnim, {
-      toValue: visible ? 0 : -DRAWER_WIDTH,
-      duration: 220,
-      useNativeDriver: true,
-    }).start();
-  }, [visible, slideAnim]);
+    if (visible) {
+      setIsMounted(true);
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 220,
+        useNativeDriver: true,
+      }).start();
+      return;
+    }
 
-  if (!visible) {
+    if (isMounted) {
+      Animated.timing(slideAnim, {
+        toValue: -DRAWER_WIDTH,
+        duration: 220,
+        useNativeDriver: true,
+      }).start(({ finished }) => {
+        if (finished) {
+          setIsMounted(false);
+        }
+      });
+    }
+  }, [isMounted, slideAnim, visible]);
+
+  if (!isMounted) {
     return null;
   }
 
