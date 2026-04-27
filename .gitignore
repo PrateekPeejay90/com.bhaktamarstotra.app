@@ -3,19 +3,23 @@
 # dependencies
 node_modules/
 
-# Expo
-.expo/
+# build output
 dist/
 web-build/
-expo-env.d.ts
 
 # Native
 *.orig.*
 *.jks
+*.keystore
 *.p8
 *.p12
 *.key
 *.mobileprovision
+android/.gradle/
+android/app/build/
+android/build/
+android/local.properties
+android/.idea/
 
 # Metro
 .metro-health-check*
@@ -34,5 +38,8 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+credentials.json
+bhaktamar_stotra.keystore
 
 app-example

@@ -1,16 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { List, MagnifyingGlass } from 'phosphor-react-native';
 import { dataService } from '../services/dataService';
 import { BhaktamarData, Verse } from '../types';
+import { useTheme } from '../contexts/ThemeContext';
+import { useLanguage } from '../contexts/LanguageContext';
+import { useFontSize } from '../contexts/FontSizeContext';
 
 interface HomeScreenProps {
   onStartReading: () => void;
   onBrowseVerses: () => void;
   onSamputt: () => void;
+  onSearch: () => void;
+  onOpenDrawer: () => void;
 }
 
-export const HomeScreen: React.FC<HomeScreenProps> = ({ onStartReading, onBrowseVerses, onSamputt }) => {
+export const HomeScreen: React.FC<HomeScreenProps> = ({ onStartReading, onBrowseVerses, onSamputt, onSearch, onOpenDrawer }) => {
   const [appData, setAppData] = useState<BhaktamarData | null>(null);
+  const { colors } = useTheme();
+  const { t } = useLanguage();
+  const { fontSizes, scaleFontSize } = useFontSize();
 
   useEffect(() => {
     const data = dataService.getAllData();
@@ -29,61 +38,72 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onStartReading, onBrowse
     onSamputt();
   };
 
+  const handleSearch = () => {
+    onSearch();
+  };
+
   if (!appData) {
     return (
-      <View style={styles.loadingContainer}>
-        <Text>Loading Bhaktamar Stotra...</Text>
+      <View style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
+        <Text style={[styles.loadingText, { color: colors.text, fontSize: scaleFontSize(16) }]}>{t.home.loading}</Text>
       </View>
     );
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.content}>
-        {/* Main Title */}
-        <View style={styles.titleSection}>
-          <Text style={styles.title}>{appData.title}</Text>
-          <Text style={styles.subtitle}>भक्तामर स्तोत्र</Text>
-          <Text style={styles.author}>by {appData.author}</Text>
-        </View>
+    <>
+      <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={styles.content}>
+          {/* Header Controls */}
+          <View style={styles.headerControls}>
+            <TouchableOpacity 
+              style={[styles.iconButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
+              onPress={onOpenDrawer}
+            >
+              <List size={24} color={colors.spiritual} weight="bold" />
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[styles.iconButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
+              onPress={handleSearch}
+            >
+              <MagnifyingGlass size={24} color={colors.spiritual} weight="bold" />
+            </TouchableOpacity>
+          </View>
 
-        {/* App Stats */}
-        <View style={styles.statsContainer}>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{dataService.getTotalVerses()}</Text>
-            <Text style={styles.statLabel}>Verses</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{appData.total_pages}</Text>
-            <Text style={styles.statLabel}>Pages</Text>
-          </View>
+          {/* Main Title */}
+          <View style={styles.titleSection}>
+          <Text style={[styles.title, { color: colors.spiritual, fontSize: scaleFontSize(28) }]}>{t.home.title}</Text>
+          <Text style={[styles.subtitle, { color: colors.spiritualLight, fontSize: fontSizes.sanskrit }]}>भक्तामर स्तोत्र</Text>
+          <Text style={[styles.author, { color: colors.spiritualLight, fontSize: scaleFontSize(16) }]}>by {appData.author}</Text>
         </View>
 
         {/* Action Buttons */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity 
-            style={[styles.button, styles.primaryButton]}
+            style={[styles.button, { backgroundColor: colors.button }]}
             onPress={handleStartReading}
           >
-            <Text style={styles.primaryButtonText}>Start Reading</Text>
+            <Text style={[styles.primaryButtonText, { color: colors.buttonText, fontSize: scaleFontSize(18) }]}>{t.home.startReading}</Text>
           </TouchableOpacity>
           
           <TouchableOpacity 
-            style={[styles.button, styles.secondaryButton]}
+            style={[styles.button, styles.secondaryButton, { borderColor: colors.spiritual }]}
             onPress={handleBrowseVerses}
           >
-            <Text style={styles.secondaryButtonText}>Browse All Verses</Text>
+            <Text style={[styles.secondaryButtonText, { color: colors.spiritual, fontSize: scaleFontSize(18) }]}>{t.home.browseVerses}</Text>
           </TouchableOpacity>
           
           <TouchableOpacity 
-            style={[styles.button, styles.samputButton]}
+            style={[styles.button, styles.samputButton, { backgroundColor: colors.accent, borderColor: colors.spiritual }]}
             onPress={handleSamputt}
           >
-            <Text style={styles.samputButtonText}>🕉️ Samputt Reading</Text>
+            <Text style={[styles.samputButtonText, { color: colors.spiritual, fontSize: scaleFontSize(18) }]}>{t.home.samputReading}</Text>
           </TouchableOpacity>
         </View>
       </View>
     </ScrollView>
+    </>
   );
 };
 
@@ -101,6 +121,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#f8f6f0',
   },
+  loadingText: {
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  headerControls: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  iconButton: {
+    padding: 8,
+    borderRadius: 10,
+    borderWidth: 1,
+    backgroundColor: '#ffffff',
+    borderColor: '#E0E0E0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
   titleSection: {
     alignItems: 'center',
     marginBottom: 48,
@@ -109,19 +150,16 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#8B4513',
     textAlign: 'center',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 18,
-    color: '#CD853F',
     textAlign: 'center',
     marginBottom: 8,
   },
   author: {
     fontSize: 16,
-    color: '#CD853F',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -179,39 +217,13 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     lineHeight: 20,
   },
-  statsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    backgroundColor: '#ffffff',
-    padding: 20,
-    borderRadius: 12,
-    marginBottom: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  statItem: {
-    alignItems: 'center',
-  },
-  statNumber: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#8B4513',
-  },
-  statLabel: {
-    fontSize: 14,
-    color: '#666666',
-    marginTop: 4,
-  },
   buttonContainer: {
     gap: 12,
   },
   button: {
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 10,
     alignItems: 'center',
   },
   primaryButton: {

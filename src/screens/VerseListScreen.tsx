@@ -8,15 +8,24 @@ import {
   TextInput,
   SafeAreaView 
 } from 'react-native';
+import { List } from 'phosphor-react-native';
 import { dataService } from '../services/dataService';
 import { Verse } from '../types';
+import { useTheme } from '../contexts/ThemeContext';
+import { useLanguage } from '../contexts/LanguageContext';
+import { useFontSize } from '../contexts/FontSizeContext';
+import { BackIconButton } from '../components/BackIconButton';
 
 interface VerseListScreenProps {
   onVerseSelect: (verse: Verse) => void;
   onBack: () => void;
+  onOpenDrawer: () => void;
 }
 
-export const VerseListScreen: React.FC<VerseListScreenProps> = ({ onVerseSelect, onBack }) => {
+export const VerseListScreen: React.FC<VerseListScreenProps> = ({ onVerseSelect, onBack, onOpenDrawer }) => {
+  const { colors } = useTheme();
+  const { t } = useLanguage();
+  const { fontSizes, scaleFontSize } = useFontSize();
   const [verses, setVerses] = useState<Verse[]>([]);
   const [filteredVerses, setFilteredVerses] = useState<Verse[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -38,53 +47,56 @@ export const VerseListScreen: React.FC<VerseListScreenProps> = ({ onVerseSelect,
 
   const renderVerseItem = ({ item }: { item: Verse }) => (
     <TouchableOpacity 
-      style={styles.verseItem}
+      style={[styles.verseItem, { backgroundColor: colors.surface }]}
       onPress={() => onVerseSelect(item)}
     >
       <View style={styles.verseHeader}>
-        <Text style={styles.verseNumber}>Verse {item.verse_number}</Text>
-        <Text style={styles.pageNumber}>Page {item.page_number}</Text>
+        <Text style={[styles.verseNumber, { color: colors.spiritual, fontSize: fontSizes.labels }]}>{t.verseDetail.verse} {item.verse_number}</Text>
+        <Text style={[styles.pageNumber, { color: colors.textSecondary, fontSize: scaleFontSize(12) }]}>{t.verseDetail.page} {item.page_number}</Text>
       </View>
       
-      <Text style={styles.sanskritPreview} numberOfLines={2}>
+      <Text style={[styles.sanskritPreview, { color: colors.text, fontSize: fontSizes.sanskrit, lineHeight: fontSizes.sanskrit * 1.5 }]} numberOfLines={2}>
         {item.content}
       </Text>
       
-      <Text style={styles.transliterationPreview} numberOfLines={1}>
+      <Text style={[styles.transliterationPreview, { color: colors.textSecondary, fontSize: fontSizes.transliteration, lineHeight: fontSizes.transliteration * 1.45 }]} numberOfLines={1}>
         {item.transliteration}
       </Text>
       
-      <Text style={styles.meaningPreview} numberOfLines={2}>
+      <Text style={[styles.meaningPreview, { color: colors.text, fontSize: fontSizes.hindi, lineHeight: fontSizes.hindi * 1.45 }]} numberOfLines={2}>
         {item.hindi_meaning}
       </Text>
     </TouchableOpacity>
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={onBack}>
-          <Text style={styles.backButtonText}>← Back</Text>
+      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+        <BackIconButton onPress={onBack} />
+        <Text style={[styles.headerTitle, { color: colors.spiritual, fontSize: scaleFontSize(18) }]}>{t.verseList.title}</Text>
+        <TouchableOpacity 
+          style={[styles.menuButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
+          onPress={onOpenDrawer}
+        >
+          <List size={20} color={colors.spiritual} weight="bold" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>All Verses</Text>
-        <View style={styles.placeholder} />
       </View>
 
       {/* Search Bar */}
       <View style={styles.searchContainer}>
         <TextInput
-          style={styles.searchInput}
-          placeholder="Search verses..."
-          placeholderTextColor="#999"
+          style={[styles.searchInput, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text, fontSize: scaleFontSize(16) }]}
+          placeholder={t.verseList.searchPlaceholder}
+          placeholderTextColor={colors.textSecondary}
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
       </View>
 
       {/* Results Count */}
-      <Text style={styles.resultsCount}>
-        {filteredVerses.length} verse{filteredVerses.length !== 1 ? 's' : ''} found
+      <Text style={[styles.resultsCount, { color: colors.textSecondary, fontSize: scaleFontSize(14) }]}>
+        {filteredVerses.length} {filteredVerses.length === 1 ? t.verseList.verse : t.verseList.verses} {t.verseList.versesFound}
       </Text>
 
       {/* Verse List */}
@@ -114,21 +126,17 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
   },
-  backButton: {
-    padding: 8,
-  },
-  backButtonText: {
-    color: '#8B4513',
-    fontSize: 16,
-    fontWeight: '600',
-  },
   headerTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#8B4513',
+    flex: 1,
+    textAlign: 'center',
   },
-  placeholder: {
-    width: 60, // Same width as back button for centering
+  menuButton: {
+    padding: 8,
+    borderRadius: 10,
+    borderWidth: 1,
   },
   searchContainer: {
     padding: 16,

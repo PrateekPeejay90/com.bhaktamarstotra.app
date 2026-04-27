@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export type FontSizeLevel = 'small' | 'medium' | 'large' | 'extra-large';
 
@@ -8,6 +9,7 @@ interface FontSizeSettings {
   hindi: number;
   english: number;
   labels: number;
+  uiScale: number;
 }
 
 interface FontSizeContextType {
@@ -16,6 +18,7 @@ interface FontSizeContextType {
   increaseFontSize: () => void;
   decreaseFontSize: () => void;
   setFontSizeLevel: (level: FontSizeLevel) => void;
+  scaleFontSize: (baseSize: number) => number;
 }
 
 const fontSizePresets: Record<FontSizeLevel, FontSizeSettings> = {
@@ -25,6 +28,7 @@ const fontSizePresets: Record<FontSizeLevel, FontSizeSettings> = {
     hindi: 14,
     english: 14,
     labels: 12,
+    uiScale: 0.9,
   },
   'medium': {
     sanskrit: 18,
@@ -32,6 +36,7 @@ const fontSizePresets: Record<FontSizeLevel, FontSizeSettings> = {
     hindi: 16,
     english: 16,
     labels: 14,
+    uiScale: 1,
   },
   'large': {
     sanskrit: 20,
@@ -39,6 +44,7 @@ const fontSizePresets: Record<FontSizeLevel, FontSizeSettings> = {
     hindi: 18,
     english: 18,
     labels: 16,
+    uiScale: 1.12,
   },
   'extra-large': {
     sanskrit: 24,
@@ -46,6 +52,7 @@ const fontSizePresets: Record<FontSizeLevel, FontSizeSettings> = {
     hindi: 20,
     english: 20,
     labels: 18,
+    uiScale: 1.25,
   },
 };
 
@@ -55,16 +62,44 @@ interface FontSizeProviderProps {
   children: ReactNode;
 }
 
+const FONT_SIZE_STORAGE_KEY = '@bhaktamar_font_size';
+
 export const FontSizeProvider: React.FC<FontSizeProviderProps> = ({ children }) => {
   const [currentLevel, setCurrentLevel] = useState<FontSizeLevel>('medium');
 
+  useEffect(() => {
+    loadFontSize();
+  }, []);
+
+  const loadFontSize = async () => {
+    try {
+      const savedFontSize = await AsyncStorage.getItem(FONT_SIZE_STORAGE_KEY);
+      if (savedFontSize && ['small', 'medium', 'large', 'extra-large'].includes(savedFontSize)) {
+        setCurrentLevel(savedFontSize as FontSizeLevel);
+      }
+    } catch (error) {
+      console.log('Error loading font size:', error);
+    }
+  };
+
+  const saveFontSize = async (level: FontSizeLevel) => {
+    try {
+      await AsyncStorage.setItem(FONT_SIZE_STORAGE_KEY, level);
+    } catch (error) {
+      console.log('Error saving font size:', error);
+    }
+  };
+
   const fontSizes = fontSizePresets[currentLevel];
+  const scaleFontSize = (baseSize: number) => Math.round(baseSize * fontSizes.uiScale);
 
   const increaseFontSize = () => {
     const levels: FontSizeLevel[] = ['small', 'medium', 'large', 'extra-large'];
     const currentIndex = levels.indexOf(currentLevel);
     if (currentIndex < levels.length - 1) {
-      setCurrentLevel(levels[currentIndex + 1]);
+      const newLevel = levels[currentIndex + 1];
+      setCurrentLevel(newLevel);
+      saveFontSize(newLevel);
     }
   };
 
@@ -72,12 +107,15 @@ export const FontSizeProvider: React.FC<FontSizeProviderProps> = ({ children }) 
     const levels: FontSizeLevel[] = ['small', 'medium', 'large', 'extra-large'];
     const currentIndex = levels.indexOf(currentLevel);
     if (currentIndex > 0) {
-      setCurrentLevel(levels[currentIndex - 1]);
+      const newLevel = levels[currentIndex - 1];
+      setCurrentLevel(newLevel);
+      saveFontSize(newLevel);
     }
   };
 
   const setFontSizeLevel = (level: FontSizeLevel) => {
     setCurrentLevel(level);
+    saveFontSize(level);
   };
 
   const value: FontSizeContextType = {
@@ -86,6 +124,7 @@ export const FontSizeProvider: React.FC<FontSizeProviderProps> = ({ children }) 
     increaseFontSize,
     decreaseFontSize,
     setFontSizeLevel,
+    scaleFontSize,
   };
 
   return (

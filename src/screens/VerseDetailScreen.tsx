@@ -7,30 +7,35 @@ import {
   ScrollView,
   SafeAreaView 
 } from 'react-native';
+import { List } from 'phosphor-react-native';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { dataService } from '../services/dataService';
-import { Verse, Language } from '../types';
+import { Verse } from '../types';
 import { useFontSize } from '../contexts/FontSizeContext';
-import { FontSizeControls } from '../components/FontSizeControls';
+import { useTheme } from '../contexts/ThemeContext';
+import { useLanguage } from '../contexts/LanguageContext';
+import { BackIconButton } from '../components/BackIconButton';
 
 interface VerseDetailScreenProps {
   verse: Verse;
   onBack: () => void;
   onVerseChange?: (verse: Verse) => void;
+  onOpenDrawer: () => void;
 }
 
 export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({ 
   verse, 
   onBack, 
-  onVerseChange 
+  onVerseChange,
+  onOpenDrawer 
 }) => {
   const [currentVerse, setCurrentVerse] = useState<Verse>(verse);
-  const [selectedLanguage, setSelectedLanguage] = useState<Language>('sanskrit');
   const [isBookmarked, setIsBookmarked] = useState(false);
-  const [showFontControls, setShowFontControls] = useState(false);
   
-  // Use font size context
-  const { fontSizes } = useFontSize();
+  // Use font size context and theme
+  const { fontSizes, scaleFontSize } = useFontSize();
+  const { colors } = useTheme();
+  const { t } = useLanguage();
 
   const totalVerses = dataService.getTotalVerses();
   const canGoPrevious = currentVerse.verse_number! > 1;
@@ -75,163 +80,50 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
     }
   };
 
-  const getDisplayText = () => {
-    switch (selectedLanguage) {
-      case 'sanskrit':
-        return currentVerse.content;
-      case 'transliteration':
-        return currentVerse.transliteration;
-      case 'hindi':
-        return currentVerse.hindi_meaning;
-      case 'english':
-        return currentVerse.english_meaning;
-      default:
-        return currentVerse.content;
-    }
-  };
-
-  const getTextStyle = () => {
-    const baseStyle = {
-      lineHeight: undefined as number | undefined,
-    };
-    
-    switch (selectedLanguage) {
-      case 'sanskrit':
-        return [
-          styles.sanskritText, 
-          { 
-            fontSize: fontSizes.sanskrit,
-            lineHeight: fontSizes.sanskrit * 1.5
-          }
-        ];
-      case 'transliteration':
-        return [
-          styles.transliterationText, 
-          { 
-            fontSize: fontSizes.transliteration,
-            lineHeight: fontSizes.transliteration * 1.5
-          }
-        ];
-      case 'hindi':
-        return [
-          styles.hindiText, 
-          { 
-            fontSize: fontSizes.hindi,
-            lineHeight: fontSizes.hindi * 1.5
-          }
-        ];
-      case 'english':
-        return [
-          styles.englishText, 
-          { 
-            fontSize: fontSizes.english,
-            lineHeight: fontSizes.english * 1.5
-          }
-        ];
-      default:
-        return [
-          styles.sanskritText, 
-          { 
-            fontSize: fontSizes.sanskrit,
-            lineHeight: fontSizes.sanskrit * 1.5
-          }
-        ];
-    }
-  };
-
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={onBack}>
-          <Text style={styles.backButtonText}>← Back</Text>
-        </TouchableOpacity>
+      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+        <BackIconButton onPress={onBack} />
         
         <View style={styles.headerCenter}>
-          <Text style={styles.verseTitle}>Verse {currentVerse.verse_number}</Text>
-          <Text style={styles.pageInfo}>Page {currentVerse.page_number}</Text>
+          <Text style={[styles.verseTitle, { color: colors.spiritual, fontSize: scaleFontSize(18) }]}>{t.verseDetail.verse} {currentVerse.verse_number}</Text>
+          <Text style={[styles.pageInfo, { color: colors.textSecondary, fontSize: scaleFontSize(12) }]}>{t.verseDetail.page} {currentVerse.page_number}</Text>
         </View>
         
         <View style={styles.headerRight}>
+          <TouchableOpacity style={[styles.bookmarkButton, { backgroundColor: colors.accent }]} onPress={toggleBookmark}>
+            <Text style={[styles.bookmarkText, { color: colors.spiritual, fontSize: scaleFontSize(24) }]}>{isBookmarked ? '★' : '☆'}</Text>
+          </TouchableOpacity>
           <TouchableOpacity 
-            style={styles.fontSizeButton} 
-            onPress={() => setShowFontControls(!showFontControls)}
+            style={[styles.menuButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
+            onPress={onOpenDrawer}
           >
-            <Text style={styles.fontSizeButtonText}>Aa</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.bookmarkButton} onPress={toggleBookmark}>
-            <Text style={styles.bookmarkText}>{isBookmarked ? '★' : '☆'}</Text>
+            <List size={20} color={colors.spiritual} weight="bold" />
           </TouchableOpacity>
         </View>
       </View>
-
-      {/* Language Selector */}
-      <View style={styles.languageSelector}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {(['sanskrit', 'transliteration', 'hindi', 'english'] as Language[]).map((lang) => (
-            <TouchableOpacity
-              key={lang}
-              style={[
-                styles.languageButton,
-                selectedLanguage === lang && styles.activeLanguageButton
-              ]}
-              onPress={() => setSelectedLanguage(lang)}
-            >
-              <Text style={[
-                styles.languageButtonText,
-                selectedLanguage === lang && styles.activeLanguageButtonText
-              ]}>
-                {lang.charAt(0).toUpperCase() + lang.slice(1)}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
-
-      {/* Font Size Controls */}
-      {showFontControls && (
-        <View style={styles.fontControlsContainer}>
-          <FontSizeControls style={styles.fontControls} />
-        </View>
-      )}
 
       {/* Verse Content */}
-      <PanGestureHandler onGestureEvent={onSwipeGesture}>
-        <ScrollView style={styles.contentContainer} showsVerticalScrollIndicator={false}>
-        <View style={styles.verseContent}>
-          {selectedLanguage === 'sanskrit' ? (
-            // Handle Sanskrit text with line breaks
-            <View>
-              {getDisplayText().split('\n').map((line, index) => (
-                <Text key={index} style={getTextStyle()}>
-                  {line}
-                </Text>
-              ))}
-            </View>
-          ) : (
-            // Regular text for other languages
-            <Text style={getTextStyle()}>
-              {getDisplayText()}
-            </Text>
-          )}
-        </View>
-
-        {/* Show all translations when in Sanskrit mode */}
-        {selectedLanguage === 'sanskrit' && (
-          <View style={styles.translationsContainer}>
-            <View style={styles.translationSection}>
-              <Text style={[styles.translationLabel, { fontSize: fontSizes.labels }]}>Transliteration:</Text>
+      <View style={styles.contentArea}>
+        <PanGestureHandler onGestureEvent={onSwipeGesture}>
+          <ScrollView
+            style={[styles.contentContainer, { backgroundColor: colors.background }]}
+            contentContainerStyle={styles.contentScrollContent}
+            showsVerticalScrollIndicator={false}
+          >
+            <View style={[styles.verseContent, { backgroundColor: colors.surface }]}>
               <View>
-                {currentVerse.transliteration.split('\n').map((line, index) => (
-                  <Text 
-                    key={index} 
+                {currentVerse.content.split('\n').map((line, index) => (
+                  <Text
+                    key={index}
                     style={[
-                      styles.transliterationText, 
-                      { 
-                        fontSize: fontSizes.transliteration,
-                        lineHeight: fontSizes.transliteration * 1.5
-                      }
+                      styles.sanskritText,
+                      {
+                        fontSize: fontSizes.sanskrit,
+                        lineHeight: fontSizes.sanskrit * 1.5,
+                        color: colors.text,
+                      },
                     ]}
                   >
                     {line}
@@ -239,65 +131,111 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
                 ))}
               </View>
             </View>
-            
-            <View style={styles.translationSection}>
-              <Text style={[styles.translationLabel, { fontSize: fontSizes.labels }]}>Hindi Meaning:</Text>
-              <Text 
-                style={[
-                  styles.hindiText, 
-                  { 
-                    fontSize: fontSizes.hindi,
-                    lineHeight: fontSizes.hindi * 1.5
-                  }
-                ]}
-              >
-                {currentVerse.hindi_meaning}
-              </Text>
+
+            <View style={styles.translationsContainer}>
+              <View style={styles.translationSection}>
+                <Text style={[styles.translationLabel, { fontSize: fontSizes.labels, color: colors.spiritual }]}>
+                  Transliteration:
+                </Text>
+                <View>
+                  {currentVerse.transliteration.split('\n').map((line, index) => (
+                    <Text
+                      key={index}
+                      style={[
+                        styles.transliterationText,
+                        {
+                          fontSize: fontSizes.transliteration,
+                          lineHeight: fontSizes.transliteration * 1.5,
+                          color: colors.text,
+                        },
+                      ]}
+                    >
+                      {line}
+                    </Text>
+                  ))}
+                </View>
+              </View>
+              
+              <View style={styles.translationSection}>
+                <Text style={[styles.translationLabel, { fontSize: fontSizes.labels, color: colors.spiritual }]}>
+                  Hindi Meaning:
+                </Text>
+                <Text
+                  style={[
+                    styles.hindiText,
+                    {
+                      fontSize: fontSizes.hindi,
+                      lineHeight: fontSizes.hindi * 1.5,
+                      color: colors.text,
+                    },
+                  ]}
+                >
+                  {currentVerse.hindi_meaning}
+                </Text>
+              </View>
+              
+              <View style={styles.translationSection}>
+                <Text style={[styles.translationLabel, { fontSize: fontSizes.labels, color: colors.spiritual }]}>
+                  English Meaning:
+                </Text>
+                <Text
+                  style={[
+                    styles.englishText,
+                    {
+                      fontSize: fontSizes.english,
+                      lineHeight: fontSizes.english * 1.5,
+                      color: colors.text,
+                    },
+                  ]}
+                >
+                  {currentVerse.english_meaning}
+                </Text>
+              </View>
             </View>
-            
-            <View style={styles.translationSection}>
-              <Text style={[styles.translationLabel, { fontSize: fontSizes.labels }]}>English Meaning:</Text>
-              <Text 
-                style={[
-                  styles.englishText, 
-                  { 
-                    fontSize: fontSizes.english,
-                    lineHeight: fontSizes.english * 1.5
-                  }
-                ]}
-              >
-                {currentVerse.english_meaning}
-              </Text>
-            </View>
-          </View>
-        )}
-        </ScrollView>
-      </PanGestureHandler>
+          </ScrollView>
+        </PanGestureHandler>
+      </View>
 
       {/* Navigation Controls */}
-      <View style={styles.navigationContainer}>
+      <View style={[styles.navigationContainer, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
         <TouchableOpacity
-          style={[styles.navButton, !canGoPrevious && styles.disabledNavButton]}
+          style={[
+            styles.navButton, 
+            { backgroundColor: canGoPrevious ? colors.spiritual : colors.surface, borderColor: colors.border },
+            !canGoPrevious && styles.disabledNavButton
+          ]}
           onPress={() => navigateToVerse('previous')}
           disabled={!canGoPrevious}
         >
-          <Text style={[styles.navButtonText, !canGoPrevious && styles.disabledNavButtonText]}>
+          <Text style={[
+            styles.navButtonText,
+            { color: canGoPrevious ? colors.buttonText : colors.textSecondary, fontSize: scaleFontSize(16) },
+            !canGoPrevious && styles.disabledNavButtonText
+          ]}>
             ← Previous
           </Text>
         </TouchableOpacity>
 
         <View style={styles.progressContainer}>
-          <Text style={styles.progressText}>
+          <Text style={[styles.progressText, { color: colors.text, fontSize: scaleFontSize(14) }]}>
             {currentVerse.verse_number} of {totalVerses}
           </Text>
         </View>
 
         <TouchableOpacity
-          style={[styles.navButton, !canGoNext && styles.disabledNavButton]}
+          style={[
+            styles.navButton, 
+            { backgroundColor: canGoNext ? colors.spiritual : colors.surface, borderColor: colors.border },
+            !canGoNext && styles.disabledNavButton
+          ]}
           onPress={() => navigateToVerse('next')}
           disabled={!canGoNext}
         >
-          <Text style={[styles.navButtonText, !canGoNext && styles.disabledNavButtonText]}>
+          <Text style={[
+            styles.navButtonText,
+            { color: canGoNext ? colors.buttonText : colors.textSecondary, fontSize: scaleFontSize(16) },
+            !canGoNext && styles.disabledNavButtonText
+          ]}>
             Next →
           </Text>
         </TouchableOpacity>
@@ -321,16 +259,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
   },
-  backButton: {
-    padding: 8,
-  },
-  backButtonText: {
-    color: '#8B4513',
-    fontSize: 16,
-    fontWeight: '600',
-  },
   headerCenter: {
     alignItems: 'center',
+    flex: 1,
   },
   verseTitle: {
     fontSize: 18,
@@ -347,18 +278,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
-  fontSizeButton: {
-    padding: 8,
-    backgroundColor: '#F5DEB3',
-    borderRadius: 16,
-    minWidth: 32,
-    alignItems: 'center',
-  },
-  fontSizeButtonText: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#8B4513',
-  },
   bookmarkButton: {
     padding: 8,
   },
@@ -366,40 +285,19 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: '#8B4513',
   },
-  fontControlsContainer: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    backgroundColor: '#f8f6f0',
+  menuButton: {
+    padding: 8,
+    borderRadius: 10,
+    borderWidth: 1,
   },
-  fontControls: {
-    marginBottom: 0,
-  },
-  languageSelector: {
-    backgroundColor: '#ffffff',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  languageButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    marginHorizontal: 4,
-    borderRadius: 20,
-    backgroundColor: '#f0f0f0',
-  },
-  activeLanguageButton: {
-    backgroundColor: '#8B4513',
-  },
-  languageButtonText: {
-    fontSize: 14,
-    color: '#666666',
-    fontWeight: '500',
-  },
-  activeLanguageButtonText: {
-    color: '#ffffff',
+  contentArea: {
+    flex: 1,
   },
   contentContainer: {
     flex: 1,
+  },
+  contentScrollContent: {
+    paddingBottom: 16,
   },
   verseContent: {
     padding: 20,
@@ -467,6 +365,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     borderTopWidth: 1,
     borderTopColor: '#e0e0e0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 8,
   },
   navButton: {
     paddingHorizontal: 20,
