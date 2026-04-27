@@ -8,6 +8,7 @@ import {
   TextInput,
   SafeAreaView 
 } from 'react-native';
+import { ArrowRight } from 'phosphor-react-native';
 import { dataService } from '../services/dataService';
 import { searchService } from '../services/searchService';
 import { Verse } from '../types';
@@ -29,6 +30,9 @@ export const VerseListScreen: React.FC<VerseListScreenProps> = ({ onVerseSelect,
   const [verses, setVerses] = useState<Verse[]>([]);
   const [filteredVerses, setFilteredVerses] = useState<Verse[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const directVerseMatch = searchQuery.trim().match(/^(?:verse|shlok|श्लोक)?\s*(\d{1,2})$/i);
+  const directVerseNumber = directVerseMatch ? Number(directVerseMatch[1]) : null;
+  const directVerse = directVerseNumber ? dataService.getVerseByNumber(directVerseNumber) : undefined;
 
   useEffect(() => {
     const allVerses = dataService.getAllVerses();
@@ -37,13 +41,23 @@ export const VerseListScreen: React.FC<VerseListScreenProps> = ({ onVerseSelect,
   }, []);
 
   useEffect(() => {
-    if (searchQuery.trim() === '') {
+    const trimmedQuery = searchQuery.trim();
+
+    if (trimmedQuery === '') {
       setFilteredVerses(verses);
+    } else if (directVerseNumber !== null) {
+      setFilteredVerses(directVerse ? [directVerse] : []);
     } else {
-      const results = searchService.searchVerses(searchQuery);
+      const results = searchService.searchVerses(trimmedQuery);
       setFilteredVerses(results.map((result) => result.verse));
     }
-  }, [searchQuery, verses]);
+  }, [directVerse, directVerseNumber, searchQuery, verses]);
+
+  const handleSearchSubmit = () => {
+    if (directVerse) {
+      onVerseSelect(directVerse);
+    }
+  };
 
   const renderVerseItem = ({ item }: { item: Verse }) => (
     <TouchableOpacity 
@@ -86,7 +100,20 @@ export const VerseListScreen: React.FC<VerseListScreenProps> = ({ onVerseSelect,
           placeholderTextColor={colors.textSecondary}
           value={searchQuery}
           onChangeText={setSearchQuery}
+          onSubmitEditing={handleSearchSubmit}
+          returnKeyType={directVerse ? 'go' : 'search'}
         />
+        {directVerse ? (
+          <TouchableOpacity
+            style={[styles.directVerseButton, { backgroundColor: colors.spiritual }]}
+            onPress={() => onVerseSelect(directVerse)}
+          >
+            <Text style={[styles.directVerseButtonText, { color: colors.buttonText, fontSize: scaleFontSize(15) }]}>
+              {t.verseList.goToVerse} {directVerse.verse_number}
+            </Text>
+            <ArrowRight size={18} color={colors.buttonText} weight="bold" />
+          </TouchableOpacity>
+        ) : null}
       </View>
 
       {/* Results Count */}
@@ -113,6 +140,7 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     padding: 16,
+    gap: 10,
   },
   searchInput: {
     backgroundColor: '#ffffff',
@@ -122,6 +150,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     borderWidth: 1,
     borderColor: '#e0e0e0',
+  },
+  directVerseButton: {
+    alignItems: 'center',
+    borderRadius: 10,
+    flexDirection: 'row',
+    gap: 6,
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  directVerseButtonText: {
+    fontWeight: '700',
   },
   resultsCount: {
     paddingHorizontal: 16,

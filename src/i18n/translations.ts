@@ -19,6 +19,7 @@ export interface Translations {
   verseList: {
     title: string;
     searchPlaceholder: string;
+    goToVerse: string;
     versesFound: string;
     verse: string;
     verses: string;
@@ -29,7 +30,9 @@ export interface Translations {
     sanskrit: string;
     transliteration: string;
     hindi: string;
+    hindiMeaning: string;
     english: string;
+    englishMeaning: string;
   };
   samputt: {
     title: string;
@@ -112,8 +115,9 @@ export const translations: Record<LanguageCode, Translations> = {
     },
     verseList: {
       title: 'All Verses',
-      searchPlaceholder: 'Search verses...',
-      versesFound: 'verses found',
+      searchPlaceholder: 'Search or enter verse number...',
+      goToVerse: 'Go to Verse',
+      versesFound: 'found',
       verse: 'verse',
       verses: 'verses',
     },
@@ -123,7 +127,9 @@ export const translations: Record<LanguageCode, Translations> = {
       sanskrit: 'Sanskrit',
       transliteration: 'Transliteration',
       hindi: 'Hindi',
+      hindiMeaning: 'Hindi Meaning',
       english: 'English',
+      englishMeaning: 'English Meaning',
     },
     samputt: {
       title: 'Samputt Reading',
@@ -204,8 +210,9 @@ export const translations: Record<LanguageCode, Translations> = {
     },
     verseList: {
       title: 'सभी श्लोक',
-      searchPlaceholder: 'श्लोक खोजें...',
-      versesFound: 'श्लोक मिले',
+      searchPlaceholder: 'खोजें या श्लोक संख्या दर्ज करें...',
+      goToVerse: 'श्लोक पर जाएं',
+      versesFound: 'मिले',
       verse: 'श्लोक',
       verses: 'श्लोक',
     },
@@ -215,7 +222,9 @@ export const translations: Record<LanguageCode, Translations> = {
       sanskrit: 'संस्कृत',
       transliteration: 'लिप्यंतरण',
       hindi: 'हिंदी',
+      hindiMeaning: 'हिंदी अर्थ',
       english: 'अंग्रेज़ी',
+      englishMeaning: 'अंग्रेज़ी अर्थ',
     },
     samputt: {
       title: 'संपुट पाठ',

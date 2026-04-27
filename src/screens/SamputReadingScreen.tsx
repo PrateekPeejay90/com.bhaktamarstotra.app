@@ -8,12 +8,14 @@ import {
   SafeAreaView
 } from 'react-native';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
+import { ArrowLeft, ArrowRight } from 'phosphor-react-native';
 import { dataService } from '../services/dataService';
 import { Verse } from '../types';
 import { useFontSize } from '../contexts/FontSizeContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { ScreenHeader } from '../components/ScreenHeader';
+import { CollapsibleSection } from '../components/CollapsibleSection';
 
 interface SamputReadingScreenProps {
   samputVerseNumber: number;
@@ -87,6 +89,8 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
   const currentItem = samputSequence[currentIndex];
   const canGoPrevious = currentIndex > 0;
   const canGoNext = currentIndex < samputSequence.length - 1;
+  const previousNavColor = canGoPrevious ? colors.buttonText : colors.textSecondary;
+  const nextNavColor = canGoNext ? colors.buttonText : colors.textSecondary;
 
   const navigateToIndex = (direction: 'previous' | 'next') => {
     if (direction === 'previous' && canGoPrevious) {
@@ -141,21 +145,6 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
         subtitleFontSize={scaleFontSize(12)}
       />
 
-      {/* Verse Type Indicator */}
-      <View style={[
-        styles.verseTypeContainer,
-        { backgroundColor: currentItem.isSamputVerse ? colors.accent : colors.surface, borderBottomColor: colors.border },
-        currentItem.isSamputVerse && styles.samputVerseTypeContainer
-      ]}>
-        <Text style={[
-          styles.verseTypeText,
-          { color: currentItem.isSamputVerse ? colors.spiritual : colors.text, fontSize: scaleFontSize(16) },
-          currentItem.isSamputVerse && styles.samputVerseTypeText
-        ]}>
-          {currentItem.isSamputVerse ? t.samputt.title : `${t.verseDetail.verse} ${currentItem.verse.verse_number}`}
-        </Text>
-      </View>
-
       {/* Verse Content */}
       <View style={styles.contentArea}>
         <PanGestureHandler onGestureEvent={onSwipeGesture}>
@@ -186,13 +175,12 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
                   >
                     {line}
                   </Text>
-                ))}
+                  ))}
               </View>
+            </View>
 
-              <View style={[styles.transliterationContainer, { borderBottomColor: colors.border }]}>
-                <Text style={[styles.sectionLabel, { fontSize: fontSizes.labels, color: colors.spiritual }]}>
-                  {t.verseDetail.transliteration}:
-                </Text>
+            <View style={styles.collapsibleSections}>
+              <CollapsibleSection title={t.verseDetail.transliteration} titleFontSize={fontSizes.labels}>
                 {currentItem.verse.transliteration.split('\n').map((line, index) => (
                   <Text
                     key={index}
@@ -208,12 +196,9 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
                     {line}
                   </Text>
                 ))}
-              </View>
+              </CollapsibleSection>
 
-              <View style={styles.meaningContainer}>
-                <Text style={[styles.sectionLabel, { fontSize: fontSizes.labels, color: colors.spiritual }]}>
-                  {t.verseDetail.hindi}:
-                </Text>
+              <CollapsibleSection title={t.verseDetail.hindiMeaning} titleFontSize={fontSizes.labels}>
                 <Text
                   style={[
                     styles.hindiText,
@@ -226,12 +211,9 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
                 >
                   {currentItem.verse.hindi_meaning}
                 </Text>
-              </View>
+              </CollapsibleSection>
 
-              <View style={styles.meaningContainer}>
-                <Text style={[styles.sectionLabel, { fontSize: fontSizes.labels, color: colors.spiritual }]}>
-                  {t.verseDetail.english}:
-                </Text>
+              <CollapsibleSection title={t.verseDetail.englishMeaning} titleFontSize={fontSizes.labels}>
                 <Text
                   style={[
                     styles.englishText,
@@ -244,7 +226,7 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
                 >
                   {currentItem.verse.english_meaning}
                 </Text>
-              </View>
+              </CollapsibleSection>
             </View>
           </ScrollView>
         </PanGestureHandler>
@@ -261,13 +243,16 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
           onPress={() => navigateToIndex('previous')}
           disabled={!canGoPrevious}
         >
-          <Text style={[
-            styles.navButtonText,
-            { color: canGoPrevious ? colors.buttonText : colors.textSecondary, fontSize: scaleFontSize(16) },
-            !canGoPrevious && styles.disabledNavButtonText
-          ]}>
-            {t.navigation.previous}
-          </Text>
+          <View style={styles.navButtonContent}>
+            <ArrowLeft size={18} color={previousNavColor} weight="bold" />
+            <Text style={[
+              styles.navButtonText,
+              { color: previousNavColor, fontSize: scaleFontSize(16) },
+              !canGoPrevious && styles.disabledNavButtonText
+            ]}>
+              {t.navigation.previous}
+            </Text>
+          </View>
         </TouchableOpacity>
 
         <View style={styles.progressContainer}>
@@ -288,13 +273,16 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
           onPress={() => navigateToIndex('next')}
           disabled={!canGoNext}
         >
-          <Text style={[
-            styles.navButtonText,
-            { color: canGoNext ? colors.buttonText : colors.textSecondary, fontSize: scaleFontSize(16) },
-            !canGoNext && styles.disabledNavButtonText
-          ]}>
-            {t.navigation.next}
-          </Text>
+          <View style={styles.navButtonContent}>
+            <Text style={[
+              styles.navButtonText,
+              { color: nextNavColor, fontSize: scaleFontSize(16) },
+              !canGoNext && styles.disabledNavButtonText
+            ]}>
+              {t.navigation.next}
+            </Text>
+            <ArrowRight size={18} color={nextNavColor} weight="bold" />
+          </View>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -315,25 +303,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#8B4513',
   },
-  verseTypeContainer: {
-    backgroundColor: '#E6F3FF',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  samputVerseTypeContainer: {
-    backgroundColor: '#FFF8DC',
-  },
-  verseTypeText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#2E86AB',
-    textAlign: 'center',
-  },
-  samputVerseTypeText: {
-    color: '#8B4513',
-  },
   contentArea: {
     flex: 1,
   },
@@ -345,7 +314,9 @@ const styles = StyleSheet.create({
   },
   verseContent: {
     backgroundColor: '#ffffff',
-    margin: 16,
+    marginTop: 12,
+    marginHorizontal: 12,
+    marginBottom: 10,
     borderRadius: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -353,13 +324,13 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  samputVerseContent: {
-    borderLeftWidth: 4,
-    borderLeftColor: '#8B4513',
-    backgroundColor: '#FFFEF7',
+  collapsibleSections: {
+    gap: 16,
+    paddingHorizontal: 12,
   },
   sanskritContainer: {
-    padding: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 14,
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
   },
@@ -369,24 +340,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 4,
   },
-  transliterationContainer: {
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  sectionLabel: {
-    fontWeight: 'bold',
-    color: '#8B4513',
-    marginBottom: 8,
-  },
   transliterationText: {
     color: '#696969',
     fontStyle: 'italic',
     textAlign: 'center',
     marginBottom: 2,
-  },
-  meaningContainer: {
-    padding: 20,
   },
   hindiText: {
     color: '#444444',
@@ -418,6 +376,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#8B4513',
     minWidth: 100,
     alignItems: 'center',
+  },
+  navButtonContent: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 6,
+    justifyContent: 'center',
   },
   disabledNavButton: {
     backgroundColor: '#cccccc',

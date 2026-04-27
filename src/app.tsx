@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { SafeAreaView, StatusBar, StyleSheet } from 'react-native';
+import { Platform, StatusBar, StyleSheet, View } from 'react-native';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HomeScreen } from './screens/HomeScreen';
 import { VerseListScreen } from './screens/VerseListScreen';
 import { VerseDetailScreen } from './screens/VerseDetailScreen';
@@ -129,19 +130,21 @@ export default function App() {
 
   return (
     <GestureHandlerRootView style={styles.root}>
-      <ThemeProvider>
-        <LanguageProvider>
-          <FontSizeProvider>
-            <AppContent renderCurrentScreen={renderCurrentScreen} />
-            <MenuDrawer
-              visible={drawerVisible}
-              activeScreen={currentScreen}
-              onClose={closeDrawer}
-              onNavigateHome={navigateToHome}
-            />
-          </FontSizeProvider>
-        </LanguageProvider>
-      </ThemeProvider>
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <LanguageProvider>
+            <FontSizeProvider>
+              <AppContent renderCurrentScreen={renderCurrentScreen} />
+              <MenuDrawer
+                visible={drawerVisible}
+                activeScreen={currentScreen}
+                onClose={closeDrawer}
+                onNavigateHome={navigateToHome}
+              />
+            </FontSizeProvider>
+          </LanguageProvider>
+        </ThemeProvider>
+      </SafeAreaProvider>
     </GestureHandlerRootView>
   );
 }
@@ -150,12 +153,22 @@ const AppContent: React.FC<{
   renderCurrentScreen: () => React.ReactNode;
 }> = ({ renderCurrentScreen }) => {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: colors.background,
+          paddingTop: Platform.OS === 'android' ? insets.top : 0,
+          paddingBottom: Platform.OS === 'android' ? insets.bottom : 0,
+        },
+      ]}
+    >
       <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
       {renderCurrentScreen()}
-    </SafeAreaView>
+    </View>
   );
 };
 
