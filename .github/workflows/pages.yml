@@ -3,7 +3,7 @@ name: Deploy privacy policy to GitHub Pages
 on:
   push:
     branches:
-      - InProgress
+      - main
   workflow_dispatch:
 
 permissions:
