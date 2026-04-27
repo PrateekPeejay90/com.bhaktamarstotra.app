@@ -6,11 +6,11 @@ import {
   Text,
   StyleSheet,
   FlatList,
-  Modal,
 } from 'react-native';
 import { Faders } from 'phosphor-react-native';
 import { useTheme } from '../contexts/ThemeContext';
 import { useFontSize } from '../contexts/FontSizeContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { searchService, SearchOptions } from '../services/searchService';
 
 interface SearchBarProps {
@@ -23,11 +23,12 @@ interface SearchBarProps {
 export const SearchBar: React.FC<SearchBarProps> = ({
   onSearch,
   onClear,
-  placeholder = "Search verses...",
+  placeholder,
   showAdvancedOptions = false
 }) => {
   const { colors } = useTheme();
   const { scaleFontSize } = useFontSize();
+  const { t } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -89,7 +90,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           style={[styles.searchInput, { color: colors.text, fontSize: scaleFontSize(16) }]}
           value={searchTerm}
           onChangeText={setSearchTerm}
-          placeholder={placeholder}
+          placeholder={placeholder ?? t.search.placeholder}
           placeholderTextColor={colors.textSecondary}
           onSubmitEditing={() => handleSearch()}
           returnKeyType="search"
@@ -124,7 +125,9 @@ export const SearchBar: React.FC<SearchBarProps> = ({
       {/* Advanced Options Panel */}
       {showOptions && (
         <View style={[styles.optionsPanel, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <Text style={[styles.optionsSectionTitle, { color: colors.text, fontSize: scaleFontSize(16) }]}>Search In:</Text>
+          <Text style={[styles.optionsSectionTitle, { color: colors.text, fontSize: scaleFontSize(16) }]}>
+            {t.search.searchIn}:
+          </Text>
           
           <View style={styles.optionsRow}>
             <TouchableOpacity
@@ -132,7 +135,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
               onPress={() => toggleOption('includeSanskrit')}
             >
               <Text style={[styles.optionButtonText, { color: searchOptions.includeSanskrit ? colors.spiritual : colors.textSecondary, fontSize: scaleFontSize(14) }]}>
-                Sanskrit
+                {t.verseDetail.sanskrit}
               </Text>
             </TouchableOpacity>
             
@@ -141,7 +144,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
               onPress={() => toggleOption('includeTransliteration')}
             >
               <Text style={[styles.optionButtonText, { color: searchOptions.includeTransliteration ? colors.spiritual : colors.textSecondary, fontSize: scaleFontSize(14) }]}>
-                Transliteration
+                {t.verseDetail.transliteration}
               </Text>
             </TouchableOpacity>
           </View>
@@ -152,7 +155,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
               onPress={() => toggleOption('includeHindi')}
             >
               <Text style={[styles.optionButtonText, { color: searchOptions.includeHindi ? colors.spiritual : colors.textSecondary, fontSize: scaleFontSize(14) }]}>
-                Hindi
+                {t.verseDetail.hindi}
               </Text>
             </TouchableOpacity>
             
@@ -161,7 +164,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
               onPress={() => toggleOption('includeEnglish')}
             >
               <Text style={[styles.optionButtonText, { color: searchOptions.includeEnglish ? colors.spiritual : colors.textSecondary, fontSize: scaleFontSize(14) }]}>
-                English
+                {t.verseDetail.english}
               </Text>
             </TouchableOpacity>
           </View>
@@ -172,7 +175,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
               onPress={() => toggleOption('caseSensitive')}
             >
               <Text style={[styles.optionButtonText, { color: searchOptions.caseSensitive ? colors.spiritual : colors.textSecondary, fontSize: scaleFontSize(14) }]}>
-                Case Sensitive
+                {t.search.caseSensitive}
               </Text>
             </TouchableOpacity>
             
@@ -181,7 +184,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
               onPress={() => toggleOption('exactMatch')}
             >
               <Text style={[styles.optionButtonText, { color: searchOptions.exactMatch ? colors.spiritual : colors.textSecondary, fontSize: scaleFontSize(14) }]}>
-                Exact Match
+                {t.search.exactMatch}
               </Text>
             </TouchableOpacity>
           </View>

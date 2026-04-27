@@ -7,14 +7,15 @@ import {
   ScrollView,
   SafeAreaView
 } from 'react-native';
-import { List } from 'phosphor-react-native';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
+import { ArrowLeft, ArrowRight } from 'phosphor-react-native';
 import { dataService } from '../services/dataService';
 import { Verse } from '../types';
 import { useFontSize } from '../contexts/FontSizeContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
-import { BackIconButton } from '../components/BackIconButton';
+import { ScreenHeader } from '../components/ScreenHeader';
+import { CollapsibleSection } from '../components/CollapsibleSection';
 
 interface SamputReadingScreenProps {
   samputVerseNumber: number;
@@ -88,6 +89,8 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
   const currentItem = samputSequence[currentIndex];
   const canGoPrevious = currentIndex > 0;
   const canGoNext = currentIndex < samputSequence.length - 1;
+  const previousNavColor = canGoPrevious ? colors.buttonText : colors.textSecondary;
+  const nextNavColor = canGoNext ? colors.buttonText : colors.textSecondary;
 
   const navigateToIndex = (direction: 'previous' | 'next') => {
     if (direction === 'previous' && canGoPrevious) {
@@ -133,37 +136,14 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Header */}
-      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-        <BackIconButton onPress={onBack} />
-        
-        <View style={styles.headerCenter}>
-          <Text style={[styles.headerTitle, { color: colors.spiritual, fontSize: scaleFontSize(18) }]}>{t.samputt.title}</Text>
-          <Text style={[styles.headerSubtitle, { color: colors.textSecondary, fontSize: scaleFontSize(12) }]}>{t.samputt.with} {samputVerseNumber}</Text>
-        </View>
-        
-        <TouchableOpacity 
-          style={[styles.menuButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
-          onPress={onOpenDrawer}
-        >
-          <List size={20} color={colors.spiritual} weight="bold" />
-        </TouchableOpacity>
-      </View>
-
-      {/* Verse Type Indicator */}
-      <View style={[
-        styles.verseTypeContainer,
-        { backgroundColor: currentItem.isSamputVerse ? colors.accent : colors.surface, borderBottomColor: colors.border },
-        currentItem.isSamputVerse && styles.samputVerseTypeContainer
-      ]}>
-        <Text style={[
-          styles.verseTypeText,
-          { color: currentItem.isSamputVerse ? colors.spiritual : colors.text, fontSize: scaleFontSize(16) },
-          currentItem.isSamputVerse && styles.samputVerseTypeText
-        ]}>
-          {currentItem.isSamputVerse ? t.samputt.title : `${t.verseDetail.verse} ${currentItem.verse.verse_number}`}
-        </Text>
-      </View>
+      <ScreenHeader
+        title={t.samputt.title}
+        subtitle={`${t.samputt.with} ${samputVerseNumber}`}
+        onBack={onBack}
+        onOpenDrawer={onOpenDrawer}
+        titleFontSize={scaleFontSize(18)}
+        subtitleFontSize={scaleFontSize(12)}
+      />
 
       {/* Verse Content */}
       <View style={styles.contentArea}>
@@ -195,13 +175,12 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
                   >
                     {line}
                   </Text>
-                ))}
+                  ))}
               </View>
+            </View>
 
-              <View style={[styles.transliterationContainer, { borderBottomColor: colors.border }]}>
-                <Text style={[styles.sectionLabel, { fontSize: fontSizes.labels, color: colors.spiritual }]}>
-                  {t.verseDetail.transliteration}:
-                </Text>
+            <View style={styles.collapsibleSections}>
+              <CollapsibleSection title={t.verseDetail.transliteration} titleFontSize={fontSizes.labels}>
                 {currentItem.verse.transliteration.split('\n').map((line, index) => (
                   <Text
                     key={index}
@@ -217,12 +196,9 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
                     {line}
                   </Text>
                 ))}
-              </View>
+              </CollapsibleSection>
 
-              <View style={styles.meaningContainer}>
-                <Text style={[styles.sectionLabel, { fontSize: fontSizes.labels, color: colors.spiritual }]}>
-                  Hindi Meaning:
-                </Text>
+              <CollapsibleSection title={t.verseDetail.hindiMeaning} titleFontSize={fontSizes.labels}>
                 <Text
                   style={[
                     styles.hindiText,
@@ -235,12 +211,9 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
                 >
                   {currentItem.verse.hindi_meaning}
                 </Text>
-              </View>
+              </CollapsibleSection>
 
-              <View style={styles.meaningContainer}>
-                <Text style={[styles.sectionLabel, { fontSize: fontSizes.labels, color: colors.spiritual }]}>
-                  English Meaning:
-                </Text>
+              <CollapsibleSection title={t.verseDetail.englishMeaning} titleFontSize={fontSizes.labels}>
                 <Text
                   style={[
                     styles.englishText,
@@ -253,7 +226,7 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
                 >
                   {currentItem.verse.english_meaning}
                 </Text>
-              </View>
+              </CollapsibleSection>
             </View>
           </ScrollView>
         </PanGestureHandler>
@@ -270,18 +243,21 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
           onPress={() => navigateToIndex('previous')}
           disabled={!canGoPrevious}
         >
-          <Text style={[
-            styles.navButtonText,
-            { color: canGoPrevious ? colors.buttonText : colors.textSecondary, fontSize: scaleFontSize(16) },
-            !canGoPrevious && styles.disabledNavButtonText
-          ]}>
-            Previous
-          </Text>
+          <View style={styles.navButtonContent}>
+            <ArrowLeft size={18} color={previousNavColor} weight="bold" />
+            <Text style={[
+              styles.navButtonText,
+              { color: previousNavColor, fontSize: scaleFontSize(16) },
+              !canGoPrevious && styles.disabledNavButtonText
+            ]}>
+              {t.navigation.previous}
+            </Text>
+          </View>
         </TouchableOpacity>
 
         <View style={styles.progressContainer}>
           <Text style={[styles.progressText, { color: colors.text, fontSize: scaleFontSize(14) }]}>
-            {currentIndex + 1} {t.samputt.of} {samputSequence.length}
+            {currentIndex + 1} / {samputSequence.length}
           </Text>
           <Text style={[styles.progressSubtext, { color: colors.textSecondary, fontSize: scaleFontSize(12) }]}>
             {getVerseTypeLabel()}
@@ -297,13 +273,16 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
           onPress={() => navigateToIndex('next')}
           disabled={!canGoNext}
         >
-          <Text style={[
-            styles.navButtonText,
-            { color: canGoNext ? colors.buttonText : colors.textSecondary, fontSize: scaleFontSize(16) },
-            !canGoNext && styles.disabledNavButtonText
-          ]}>
-            Next
-          </Text>
+          <View style={styles.navButtonContent}>
+            <Text style={[
+              styles.navButtonText,
+              { color: nextNavColor, fontSize: scaleFontSize(16) },
+              !canGoNext && styles.disabledNavButtonText
+            ]}>
+              {t.navigation.next}
+            </Text>
+            <ArrowRight size={18} color={nextNavColor} weight="bold" />
+          </View>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -324,54 +303,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#8B4513',
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#ffffff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  headerCenter: {
-    alignItems: 'center',
-    flex: 1,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#8B4513',
-  },
-  headerSubtitle: {
-    fontSize: 12,
-    color: '#999999',
-    marginTop: 2,
-  },
-  menuButton: {
-    padding: 8,
-    borderRadius: 10,
-    borderWidth: 1,
-  },
-  verseTypeContainer: {
-    backgroundColor: '#E6F3FF',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  samputVerseTypeContainer: {
-    backgroundColor: '#FFF8DC',
-  },
-  verseTypeText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#2E86AB',
-    textAlign: 'center',
-  },
-  samputVerseTypeText: {
-    color: '#8B4513',
-  },
   contentArea: {
     flex: 1,
   },
@@ -383,7 +314,9 @@ const styles = StyleSheet.create({
   },
   verseContent: {
     backgroundColor: '#ffffff',
-    margin: 16,
+    marginTop: 12,
+    marginHorizontal: 12,
+    marginBottom: 10,
     borderRadius: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -391,13 +324,13 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  samputVerseContent: {
-    borderLeftWidth: 4,
-    borderLeftColor: '#8B4513',
-    backgroundColor: '#FFFEF7',
+  collapsibleSections: {
+    gap: 16,
+    paddingHorizontal: 12,
   },
   sanskritContainer: {
-    padding: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 14,
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
   },
@@ -407,24 +340,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 4,
   },
-  transliterationContainer: {
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  sectionLabel: {
-    fontWeight: 'bold',
-    color: '#8B4513',
-    marginBottom: 8,
-  },
   transliterationText: {
     color: '#696969',
     fontStyle: 'italic',
     textAlign: 'center',
     marginBottom: 2,
-  },
-  meaningContainer: {
-    padding: 20,
   },
   hindiText: {
     color: '#444444',
@@ -456,6 +376,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#8B4513',
     minWidth: 100,
     alignItems: 'center',
+  },
+  navButtonContent: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 6,
+    justifyContent: 'center',
   },
   disabledNavButton: {
     backgroundColor: '#cccccc',

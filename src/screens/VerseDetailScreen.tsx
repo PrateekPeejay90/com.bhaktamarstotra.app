@@ -7,14 +7,15 @@ import {
   ScrollView,
   SafeAreaView 
 } from 'react-native';
-import { List } from 'phosphor-react-native';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
+import { ArrowLeft, ArrowRight } from 'phosphor-react-native';
 import { dataService } from '../services/dataService';
 import { Verse } from '../types';
 import { useFontSize } from '../contexts/FontSizeContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
-import { BackIconButton } from '../components/BackIconButton';
+import { ScreenHeader } from '../components/ScreenHeader';
+import { CollapsibleSection } from '../components/CollapsibleSection';
 
 interface VerseDetailScreenProps {
   verse: Verse;
@@ -30,7 +31,6 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
   onOpenDrawer 
 }) => {
   const [currentVerse, setCurrentVerse] = useState<Verse>(verse);
-  const [isBookmarked, setIsBookmarked] = useState(false);
   
   // Use font size context and theme
   const { fontSizes, scaleFontSize } = useFontSize();
@@ -40,6 +40,8 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
   const totalVerses = dataService.getTotalVerses();
   const canGoPrevious = currentVerse.verse_number! > 1;
   const canGoNext = currentVerse.verse_number! < totalVerses;
+  const previousNavColor = canGoPrevious ? colors.buttonText : colors.textSecondary;
+  const nextNavColor = canGoNext ? colors.buttonText : colors.textSecondary;
 
   useEffect(() => {
     setCurrentVerse(verse);
@@ -56,11 +58,6 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
       setCurrentVerse(targetVerse);
       onVerseChange?.(targetVerse);
     }
-  };
-
-  const toggleBookmark = () => {
-    setIsBookmarked(!isBookmarked);
-    // TODO: Implement bookmark persistence
   };
 
   // Swipe gesture handler
@@ -82,35 +79,27 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Header */}
-      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-        <BackIconButton onPress={onBack} />
-        
-        <View style={styles.headerCenter}>
-          <Text style={[styles.verseTitle, { color: colors.spiritual, fontSize: scaleFontSize(18) }]}>{t.verseDetail.verse} {currentVerse.verse_number}</Text>
-          <Text style={[styles.pageInfo, { color: colors.textSecondary, fontSize: scaleFontSize(12) }]}>{t.verseDetail.page} {currentVerse.page_number}</Text>
-        </View>
-        
-        <View style={styles.headerRight}>
-          <TouchableOpacity style={[styles.bookmarkButton, { backgroundColor: colors.accent }]} onPress={toggleBookmark}>
-            <Text style={[styles.bookmarkText, { color: colors.spiritual, fontSize: scaleFontSize(24) }]}>{isBookmarked ? '★' : '☆'}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={[styles.menuButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
-            onPress={onOpenDrawer}
-          >
-            <List size={20} color={colors.spiritual} weight="bold" />
-          </TouchableOpacity>
-        </View>
-      </View>
+      <ScreenHeader
+        title={`${t.verseDetail.verse} ${currentVerse.verse_number}`}
+        subtitle={`${t.verseDetail.page} ${currentVerse.page_number}`}
+        onBack={onBack}
+        onOpenDrawer={onOpenDrawer}
+        titleFontSize={scaleFontSize(18)}
+        subtitleFontSize={scaleFontSize(12)}
+      />
 
       {/* Verse Content */}
       <View style={styles.contentArea}>
-        <PanGestureHandler onGestureEvent={onSwipeGesture}>
+        <PanGestureHandler
+          activeOffsetX={[-36, 36]}
+          failOffsetY={[-18, 18]}
+          onHandlerStateChange={onSwipeGesture}
+        >
           <ScrollView
-            style={[styles.contentContainer, { backgroundColor: colors.background }]}
+            style={[styles.contentScrollView, { backgroundColor: colors.background }]}
             contentContainerStyle={styles.contentScrollContent}
             showsVerticalScrollIndicator={false}
+            nestedScrollEnabled
           >
             <View style={[styles.verseContent, { backgroundColor: colors.surface }]}>
               <View>
@@ -133,10 +122,7 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
             </View>
 
             <View style={styles.translationsContainer}>
-              <View style={styles.translationSection}>
-                <Text style={[styles.translationLabel, { fontSize: fontSizes.labels, color: colors.spiritual }]}>
-                  Transliteration:
-                </Text>
+              <CollapsibleSection title={t.verseDetail.transliteration} titleFontSize={fontSizes.labels}>
                 <View>
                   {currentVerse.transliteration.split('\n').map((line, index) => (
                     <Text
@@ -154,12 +140,9 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
                     </Text>
                   ))}
                 </View>
-              </View>
-              
-              <View style={styles.translationSection}>
-                <Text style={[styles.translationLabel, { fontSize: fontSizes.labels, color: colors.spiritual }]}>
-                  Hindi Meaning:
-                </Text>
+              </CollapsibleSection>
+
+              <CollapsibleSection title={t.verseDetail.hindiMeaning} titleFontSize={fontSizes.labels}>
                 <Text
                   style={[
                     styles.hindiText,
@@ -172,12 +155,9 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
                 >
                   {currentVerse.hindi_meaning}
                 </Text>
-              </View>
-              
-              <View style={styles.translationSection}>
-                <Text style={[styles.translationLabel, { fontSize: fontSizes.labels, color: colors.spiritual }]}>
-                  English Meaning:
-                </Text>
+              </CollapsibleSection>
+
+              <CollapsibleSection title={t.verseDetail.englishMeaning} titleFontSize={fontSizes.labels}>
                 <Text
                   style={[
                     styles.englishText,
@@ -190,7 +170,7 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
                 >
                   {currentVerse.english_meaning}
                 </Text>
-              </View>
+              </CollapsibleSection>
             </View>
           </ScrollView>
         </PanGestureHandler>
@@ -207,18 +187,21 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
           onPress={() => navigateToVerse('previous')}
           disabled={!canGoPrevious}
         >
-          <Text style={[
-            styles.navButtonText,
-            { color: canGoPrevious ? colors.buttonText : colors.textSecondary, fontSize: scaleFontSize(16) },
-            !canGoPrevious && styles.disabledNavButtonText
-          ]}>
-            ← Previous
-          </Text>
+          <View style={styles.navButtonContent}>
+            <ArrowLeft size={18} color={previousNavColor} weight="bold" />
+            <Text style={[
+              styles.navButtonText,
+              { color: previousNavColor, fontSize: scaleFontSize(16) },
+              !canGoPrevious && styles.disabledNavButtonText
+            ]}>
+              {t.navigation.previous}
+            </Text>
+          </View>
         </TouchableOpacity>
 
         <View style={styles.progressContainer}>
           <Text style={[styles.progressText, { color: colors.text, fontSize: scaleFontSize(14) }]}>
-            {currentVerse.verse_number} of {totalVerses}
+            {currentVerse.verse_number} / {totalVerses}
           </Text>
         </View>
 
@@ -231,13 +214,16 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
           onPress={() => navigateToVerse('next')}
           disabled={!canGoNext}
         >
-          <Text style={[
-            styles.navButtonText,
-            { color: canGoNext ? colors.buttonText : colors.textSecondary, fontSize: scaleFontSize(16) },
-            !canGoNext && styles.disabledNavButtonText
-          ]}>
-            Next →
-          </Text>
+          <View style={styles.navButtonContent}>
+            <Text style={[
+              styles.navButtonText,
+              { color: nextNavColor, fontSize: scaleFontSize(16) },
+              !canGoNext && styles.disabledNavButtonText
+            ]}>
+              {t.navigation.next}
+            </Text>
+            <ArrowRight size={18} color={nextNavColor} weight="bold" />
+          </View>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -249,60 +235,24 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f8f6f0',
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#ffffff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  headerCenter: {
-    alignItems: 'center',
-    flex: 1,
-  },
-  verseTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#8B4513',
-  },
-  pageInfo: {
-    fontSize: 12,
-    color: '#999999',
-    marginTop: 2,
-  },
-  headerRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  bookmarkButton: {
-    padding: 8,
-  },
-  bookmarkText: {
-    fontSize: 24,
-    color: '#8B4513',
-  },
-  menuButton: {
-    padding: 8,
-    borderRadius: 10,
-    borderWidth: 1,
-  },
   contentArea: {
     flex: 1,
+    minHeight: 0,
   },
-  contentContainer: {
+  contentScrollView: {
     flex: 1,
+    minHeight: 0,
   },
   contentScrollContent: {
     paddingBottom: 16,
   },
   verseContent: {
-    padding: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 14,
     backgroundColor: '#ffffff',
-    margin: 16,
+    marginTop: 12,
+    marginBottom: 10,
+    marginHorizontal: 12,
     borderRadius: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -337,24 +287,8 @@ const styles = StyleSheet.create({
     textAlign: 'justify',
   },
   translationsContainer: {
-    margin: 16,
+    paddingHorizontal: 12,
     gap: 16,
-  },
-  translationSection: {
-    backgroundColor: '#ffffff',
-    padding: 16,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  translationLabel: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#8B4513',
-    marginBottom: 8,
   },
   navigationContainer: {
     flexDirection: 'row',
@@ -378,6 +312,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#8B4513',
     minWidth: 100,
     alignItems: 'center',
+  },
+  navButtonContent: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 6,
+    justifyContent: 'center',
   },
   disabledNavButton: {
     backgroundColor: '#cccccc',

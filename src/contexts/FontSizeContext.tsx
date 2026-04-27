@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { createContext, useContext, ReactNode } from 'react';
+import { usePersistedStringState } from '../hooks/usePersistedStringState';
 
 export type FontSizeLevel = 'small' | 'medium' | 'large' | 'extra-large';
 
@@ -63,32 +63,15 @@ interface FontSizeProviderProps {
 }
 
 const FONT_SIZE_STORAGE_KEY = '@bhaktamar_font_size';
+const FONT_SIZE_LEVELS = ['small', 'medium', 'large', 'extra-large'] as const;
 
 export const FontSizeProvider: React.FC<FontSizeProviderProps> = ({ children }) => {
-  const [currentLevel, setCurrentLevel] = useState<FontSizeLevel>('medium');
-
-  useEffect(() => {
-    loadFontSize();
-  }, []);
-
-  const loadFontSize = async () => {
-    try {
-      const savedFontSize = await AsyncStorage.getItem(FONT_SIZE_STORAGE_KEY);
-      if (savedFontSize && ['small', 'medium', 'large', 'extra-large'].includes(savedFontSize)) {
-        setCurrentLevel(savedFontSize as FontSizeLevel);
-      }
-    } catch (error) {
-      console.log('Error loading font size:', error);
-    }
-  };
-
-  const saveFontSize = async (level: FontSizeLevel) => {
-    try {
-      await AsyncStorage.setItem(FONT_SIZE_STORAGE_KEY, level);
-    } catch (error) {
-      console.log('Error saving font size:', error);
-    }
-  };
+  const [currentLevel, setCurrentLevel] = usePersistedStringState<FontSizeLevel>(
+    FONT_SIZE_STORAGE_KEY,
+    'medium',
+    FONT_SIZE_LEVELS,
+    'font size',
+  );
 
   const fontSizes = fontSizePresets[currentLevel];
   const scaleFontSize = (baseSize: number) => Math.round(baseSize * fontSizes.uiScale);
@@ -97,9 +80,7 @@ export const FontSizeProvider: React.FC<FontSizeProviderProps> = ({ children }) 
     const levels: FontSizeLevel[] = ['small', 'medium', 'large', 'extra-large'];
     const currentIndex = levels.indexOf(currentLevel);
     if (currentIndex < levels.length - 1) {
-      const newLevel = levels[currentIndex + 1];
-      setCurrentLevel(newLevel);
-      saveFontSize(newLevel);
+      setCurrentLevel(levels[currentIndex + 1]);
     }
   };
 
@@ -107,15 +88,12 @@ export const FontSizeProvider: React.FC<FontSizeProviderProps> = ({ children }) 
     const levels: FontSizeLevel[] = ['small', 'medium', 'large', 'extra-large'];
     const currentIndex = levels.indexOf(currentLevel);
     if (currentIndex > 0) {
-      const newLevel = levels[currentIndex - 1];
-      setCurrentLevel(newLevel);
-      saveFontSize(newLevel);
+      setCurrentLevel(levels[currentIndex - 1]);
     }
   };
 
   const setFontSizeLevel = (level: FontSizeLevel) => {
     setCurrentLevel(level);
-    saveFontSize(level);
   };
 
   const value: FontSizeContextType = {

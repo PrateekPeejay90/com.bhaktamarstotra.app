@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { List, MagnifyingGlass } from 'phosphor-react-native';
 import { dataService } from '../services/dataService';
 import { BhaktamarData, Verse } from '../types';
@@ -73,10 +73,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onStartReading, onBrowse
 
           {/* Main Title */}
           <View style={styles.titleSection}>
-          <Text style={[styles.title, { color: colors.spiritual, fontSize: scaleFontSize(28) }]}>{t.home.title}</Text>
-          <Text style={[styles.subtitle, { color: colors.spiritualLight, fontSize: fontSizes.sanskrit }]}>भक्तामर स्तोत्र</Text>
-          <Text style={[styles.author, { color: colors.spiritualLight, fontSize: scaleFontSize(16) }]}>by {appData.author}</Text>
-        </View>
+            <Image
+              source={require('../../assets/home-logo.png')}
+              style={styles.homeLogo}
+              resizeMode="contain"
+            />
+          </View>
 
         {/* Action Buttons */}
         <View style={styles.buttonContainer}>
@@ -145,7 +147,12 @@ const styles = StyleSheet.create({
   titleSection: {
     alignItems: 'center',
     marginBottom: 48,
-    paddingVertical: 40,
+    paddingVertical: 28,
+  },
+  homeLogo: {
+    width: 156,
+    height: 184,
+    marginBottom: 18,
   },
   title: {
     fontSize: 28,
