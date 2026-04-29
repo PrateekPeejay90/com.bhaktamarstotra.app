@@ -14,6 +14,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useFontSize } from '../contexts/FontSizeContext';
 import { ScreenHeader } from '../components/ScreenHeader';
+import { CollapsibleSection } from '../components/CollapsibleSection';
 
 interface SamputSelectionScreenProps {
   onBack: () => void;
@@ -97,18 +98,43 @@ export const SamputSelectionScreen: React.FC<SamputSelectionScreenProps> = ({
         />
 
         {/* Explanation */}
-        <View style={[styles.explanationContainer, { backgroundColor: colors.surface }]}>
-          <Text style={[styles.explanationTitle, { color: colors.spiritual, fontSize: scaleFontSize(18) }]}>{t.samputt.whatIs}</Text>
-          <Text style={[styles.explanationText, { color: colors.text, fontSize: scaleFontSize(16), lineHeight: scaleFontSize(16) * 1.5 }]}>
-            {t.samputt.description}
-          </Text>
-          
-          <Text style={[styles.exampleTitle, { color: colors.spiritual, fontSize: scaleFontSize(16) }]}>
-            {t.samputt.examplePattern}:
-          </Text>
-          <Text style={[styles.exampleText, { color: colors.textSecondary, fontSize: scaleFontSize(14), lineHeight: scaleFontSize(14) * 1.45 }]}>
-            Select verse 20 → Pattern: 1→20→2→20→3→20...→48→20
-          </Text>
+        <View style={styles.explanationContainer}>
+          <CollapsibleSection
+            title={t.samputt.whatIs}
+            titleFontSize={scaleFontSize(18)}
+            defaultExpanded={false}
+          >
+            <Text style={[styles.explanationText, { color: colors.text, fontSize: scaleFontSize(16), lineHeight: scaleFontSize(16) * 1.5 }]}>
+              {t.samputt.description}
+            </Text>
+
+            <Text style={[styles.detailsIntroText, { color: colors.text, fontSize: scaleFontSize(15), lineHeight: scaleFontSize(15) * 1.5 }]}>
+              {t.samputt.detailsIntro}
+            </Text>
+
+            {[t.samputt.benefit1, t.samputt.benefit2, t.samputt.benefit3].map((benefit) => (
+              <Text
+                key={benefit}
+                style={[
+                  styles.benefitText,
+                  {
+                    color: colors.text,
+                    fontSize: scaleFontSize(15),
+                    lineHeight: scaleFontSize(15) * 1.5,
+                  },
+                ]}
+              >
+                {benefit}
+              </Text>
+            ))}
+
+            <Text style={[styles.exampleTitle, { color: colors.spiritual, fontSize: scaleFontSize(16) }]}>
+              {t.samputt.examplePattern}:
+            </Text>
+            <Text style={[styles.exampleText, { color: colors.textSecondary, fontSize: scaleFontSize(14), lineHeight: scaleFontSize(14) * 1.45 }]}>
+              {t.samputt.exampleSequence}
+            </Text>
+          </CollapsibleSection>
         </View>
 
         {/* Verse Selection */}
@@ -183,21 +209,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   explanationContainer: {
-    backgroundColor: '#ffffff',
     margin: 16,
-    padding: 20,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  explanationTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#8B4513',
-    marginBottom: 12,
   },
   explanationText: {
     fontSize: 16,
@@ -205,10 +217,23 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     marginBottom: 16,
   },
+  detailsIntroText: {
+    fontSize: 15,
+    color: '#444444',
+    lineHeight: 22,
+    marginBottom: 10,
+  },
+  benefitText: {
+    fontSize: 15,
+    color: '#444444',
+    lineHeight: 22,
+    marginBottom: 8,
+  },
   exampleTitle: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#8B4513',
+    marginTop: 8,
     marginBottom: 8,
   },
   exampleText: {

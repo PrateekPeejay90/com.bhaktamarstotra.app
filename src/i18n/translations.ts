@@ -6,6 +6,7 @@ export interface Translations {
     startReading: string;
     browseVerses: string;
     samputReading: string;
+    history: string;
     searchVerses: string;
     loading: string;
   };
@@ -39,6 +40,10 @@ export interface Translations {
     selection: string;
     whatIs: string;
     description: string;
+    detailsIntro: string;
+    benefit1: string;
+    benefit2: string;
+    benefit3: string;
     selectVerse: string;
     enterNumber: string;
     quickSelect: string;
@@ -48,6 +53,7 @@ export interface Translations {
     with: string;
     of: string;
     examplePattern: string;
+    exampleSequence: string;
     chooseVerseNumber: string;
     selectedVersePreview: string;
   };
@@ -87,6 +93,11 @@ export interface Translations {
     large: string;
     extraLarge: string;
   };
+  history: {
+    title: string;
+    subtitle: string;
+    heading: string;
+  };
   common: {
     loading: string;
     error: string;
@@ -103,6 +114,7 @@ export const translations: Record<LanguageCode, Translations> = {
       startReading: 'Start Reading',
       browseVerses: 'Browse All Verses',
       samputReading: 'Start Samputt',
+      history: 'History of Bhaktamar Stotra',
       searchVerses: 'Search Verses',
       loading: 'Loading Bhaktamar Stotra...',
     },
@@ -136,6 +148,10 @@ export const translations: Record<LanguageCode, Translations> = {
       selection: 'Samputt Selection',
       whatIs: 'What is Samputt?',
       description: 'Samputt is a spiritual practice where a selected verse is repeated between each verse of the Bhaktamar Stotra. This creates a rhythmic pattern that enhances meditation and devotion.',
+      detailsIntro: 'Each verse in Bhaktamar Stotra has its own meaning and benefits. In Samputt:',
+      benefit1: '1. You increase your concentration by reading it.',
+      benefit2: '2. The verse you select for Samputt gets repeated 48 times, increasing its effect.',
+      benefit3: '3. It is all about the verse, its pronunciation, and the vibration it creates.',
       selectVerse: 'Select Samputt Verse',
       enterNumber: 'Enter verse number',
       quickSelect: 'Quick Select',
@@ -145,6 +161,7 @@ export const translations: Record<LanguageCode, Translations> = {
       with: 'With Verse',
       of: 'of',
       examplePattern: 'Example Pattern',
+      exampleSequence: 'Select verse 20 -> Pattern: 1->20->2->20->3->20...->48->20',
       chooseVerseNumber: 'Choose a verse number',
       selectedVersePreview: 'Selected Verse Preview',
     },
@@ -184,6 +201,11 @@ export const translations: Record<LanguageCode, Translations> = {
       large: 'Large',
       extraLarge: 'Extra Large',
     },
+    history: {
+      title: 'Bhaktamar History',
+      subtitle: 'Historical background',
+      heading: 'Historical Background of Bhaktamar Mantra',
+    },
     common: {
       loading: 'Loading...',
       error: 'Error',
@@ -198,6 +220,7 @@ export const translations: Record<LanguageCode, Translations> = {
       startReading: 'पढ़ना शुरू करें',
       browseVerses: 'सभी श्लोक देखें',
       samputReading: 'संपुट शुरू करें',
+      history: 'भक्तामर स्तोत्र का इतिहास',
       searchVerses: 'श्लोक खोजें',
       loading: 'भक्तामर स्तोत्र लोड हो रहा है...',
     },
@@ -231,6 +254,10 @@ export const translations: Record<LanguageCode, Translations> = {
       selection: 'संपुट चयन',
       whatIs: 'संपुट क्या है?',
       description: 'संपुट एक आध्यात्मिक अभ्यास है जिसमें भक्तामर स्तोत्र के प्रत्येक श्लोक के बीच एक चयनित श्लोक दोहराया जाता है। यह ध्यान और भक्ति को गहरा करने वाला लयबद्ध पाठ बनाता है।',
+      detailsIntro: 'भक्तामर स्तोत्र के प्रत्येक श्लोक का अपना अर्थ और लाभ है। संपुट में:',
+      benefit1: '1. इसे पढ़ने से एकाग्रता बढ़ती है।',
+      benefit2: '2. संपुट के लिए चुना गया श्लोक 48 बार दोहराया जाता है, जिससे उसका प्रभाव बढ़ता है।',
+      benefit3: '3. यह श्लोक, उसके उच्चारण और उससे उत्पन्न होने वाली ध्वनि-तरंगों पर आधारित साधना है।',
       selectVerse: 'संपुट श्लोक चुनें',
       enterNumber: 'श्लोक संख्या दर्ज करें',
       quickSelect: 'त्वरित चयन',
@@ -240,6 +267,7 @@ export const translations: Record<LanguageCode, Translations> = {
       with: 'श्लोक के साथ',
       of: 'का',
       examplePattern: 'उदाहरण क्रम',
+      exampleSequence: 'श्लोक 20 चुनें -> क्रम: 1->20->2->20->3->20...->48->20',
       chooseVerseNumber: 'एक श्लोक संख्या चुनें',
       selectedVersePreview: 'चयनित श्लोक पूर्वावलोकन',
     },
@@ -278,6 +306,11 @@ export const translations: Record<LanguageCode, Translations> = {
       medium: 'मध्यम',
       large: 'बड़ा',
       extraLarge: 'अतिरिक्त बड़ा',
+    },
+    history: {
+      title: 'भक्तामर इतिहास',
+      subtitle: 'ऐतिहासिक पृष्ठभूमि',
+      heading: 'भक्तामर मंत्र का ऐतिहासिक परिचय',
     },
     common: {
       loading: 'लोड हो रहा है...',

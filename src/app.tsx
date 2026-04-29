@@ -8,6 +8,7 @@ import { VerseDetailScreen } from './screens/VerseDetailScreen';
 import { SamputSelectionScreen } from './screens/SamputSelectionScreen';
 import { SamputReadingScreen } from './screens/SamputReadingScreen';
 import { SearchScreen } from './screens/SearchScreen';
+import { HistoryScreen } from './screens/HistoryScreen';
 import { MenuDrawer } from './components/MenuDrawer';
 import { Verse } from './types';
 import { dataService } from './services/dataService';
@@ -21,13 +22,17 @@ type Screen =
   | 'verseDetail'
   | 'samputSelection'
   | 'samputReading'
-  | 'search';
+  | 'search'
+  | 'history';
+
+type NonHistoryScreen = Exclude<Screen, 'history'>;
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('home');
   const [selectedVerse, setSelectedVerse] = useState<Verse | null>(null);
   const [samputVerseNumber, setSamputVerseNumber] = useState<number | null>(null);
   const [drawerVisible, setDrawerVisible] = useState(false);
+  const [historyBackScreen, setHistoryBackScreen] = useState<NonHistoryScreen>('home');
 
   const openDrawer = () => setDrawerVisible(true);
   const closeDrawer = () => setDrawerVisible(false);
@@ -59,6 +64,19 @@ export default function App() {
     closeDrawer();
   };
 
+  const navigateToHistory = () => {
+    if (currentScreen !== 'history') {
+      setHistoryBackScreen(currentScreen);
+    }
+
+    setCurrentScreen('history');
+    closeDrawer();
+  };
+
+  const navigateBackFromHistory = () => {
+    setCurrentScreen(historyBackScreen);
+  };
+
   const handleStartSamputt = (verseNumber: number) => {
     setSamputVerseNumber(verseNumber);
     setCurrentScreen('samputReading');
@@ -78,6 +96,7 @@ export default function App() {
             }}
             onBrowseVerses={navigateToVerseList}
             onSamputt={navigateToSamputSelection}
+            onHistory={navigateToHistory}
             onSearch={navigateToSearch}
             onOpenDrawer={openDrawer}
           />
@@ -123,6 +142,13 @@ export default function App() {
             onOpenDrawer={openDrawer}
           />
         );
+      case 'history':
+        return (
+          <HistoryScreen
+            onBack={navigateBackFromHistory}
+            onOpenDrawer={openDrawer}
+          />
+        );
       default:
         return null;
     }
@@ -140,6 +166,7 @@ export default function App() {
                 activeScreen={currentScreen}
                 onClose={closeDrawer}
                 onNavigateHome={navigateToHome}
+                onNavigateHistory={navigateToHistory}
               />
             </FontSizeProvider>
           </LanguageProvider>

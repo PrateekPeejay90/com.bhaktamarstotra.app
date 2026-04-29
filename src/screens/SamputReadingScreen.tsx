@@ -84,6 +84,7 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
     });
 
     setSamputSequence(sequence);
+    setCurrentIndex(0);
   };
 
   const currentItem = samputSequence[currentIndex];
@@ -147,11 +148,16 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
 
       {/* Verse Content */}
       <View style={styles.contentArea}>
-        <PanGestureHandler onGestureEvent={onSwipeGesture}>
+        <PanGestureHandler
+          activeOffsetX={[-36, 36]}
+          failOffsetY={[-18, 18]}
+          onHandlerStateChange={onSwipeGesture}
+        >
           <ScrollView
             style={[styles.contentContainer, { backgroundColor: colors.background }]}
             contentContainerStyle={styles.contentScrollContent}
             showsVerticalScrollIndicator={false}
+            nestedScrollEnabled
           >
             <View
               style={[
@@ -305,9 +311,11 @@ const styles = StyleSheet.create({
   },
   contentArea: {
     flex: 1,
+    minHeight: 0,
   },
   contentContainer: {
     flex: 1,
+    minHeight: 0,
   },
   contentScrollContent: {
     paddingBottom: 16,

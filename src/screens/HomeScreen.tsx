@@ -11,11 +11,19 @@ interface HomeScreenProps {
   onStartReading: () => void;
   onBrowseVerses: () => void;
   onSamputt: () => void;
+  onHistory: () => void;
   onSearch: () => void;
   onOpenDrawer: () => void;
 }
 
-export const HomeScreen: React.FC<HomeScreenProps> = ({ onStartReading, onBrowseVerses, onSamputt, onSearch, onOpenDrawer }) => {
+export const HomeScreen: React.FC<HomeScreenProps> = ({
+  onStartReading,
+  onBrowseVerses,
+  onSamputt,
+  onHistory,
+  onSearch,
+  onOpenDrawer,
+}) => {
   const [appData, setAppData] = useState<BhaktamarData | null>(null);
   const { colors } = useTheme();
   const { t } = useLanguage();
@@ -40,6 +48,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onStartReading, onBrowse
 
   const handleSearch = () => {
     onSearch();
+  };
+
+  const handleHistory = () => {
+    onHistory();
   };
 
   if (!appData) {
@@ -101,6 +113,13 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onStartReading, onBrowse
             onPress={handleSamputt}
           >
             <Text style={[styles.samputButtonText, { color: colors.spiritual, fontSize: scaleFontSize(18) }]}>{t.home.samputReading}</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.button, styles.historyButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
+            onPress={handleHistory}
+          >
+            <Text style={[styles.historyButtonText, { color: colors.text, fontSize: scaleFontSize(18) }]}>{t.home.history}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -260,5 +279,12 @@ const styles = StyleSheet.create({
     color: '#8B4513',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  historyButton: {
+    borderWidth: 1,
+  },
+  historyButtonText: {
+    fontSize: 18,
+    fontWeight: '600',
   },
 });

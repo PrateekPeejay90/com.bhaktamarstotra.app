@@ -8,7 +8,7 @@ import {
   Dimensions,
   ScrollView,
 } from 'react-native';
-import { House, X } from 'phosphor-react-native';
+import { BookOpenText, House, X } from 'phosphor-react-native';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useFontSize } from '../contexts/FontSizeContext';
@@ -17,9 +17,10 @@ import { LanguageMenu } from './LanguageMenu';
 
 interface MenuDrawerProps {
   visible: boolean;
-  activeScreen: 'home' | 'verseList' | 'verseDetail' | 'samputSelection' | 'samputReading' | 'search';
+  activeScreen: 'home' | 'verseList' | 'verseDetail' | 'samputSelection' | 'samputReading' | 'search' | 'history';
   onClose: () => void;
   onNavigateHome: () => void;
+  onNavigateHistory: () => void;
 }
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -30,6 +31,7 @@ export const MenuDrawer: React.FC<MenuDrawerProps> = ({
   activeScreen,
   onClose,
   onNavigateHome,
+  onNavigateHistory,
 }) => {
   const { colors } = useTheme();
   const { t } = useLanguage();
@@ -105,6 +107,22 @@ export const MenuDrawer: React.FC<MenuDrawerProps> = ({
             >
               <House size={18} color={colors.spiritual} weight="bold" />
               <Text style={[styles.navButtonText, { color: colors.text, fontSize: scaleFontSize(15) }]}>{t.navigation.home}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.navButton,
+                {
+                  backgroundColor: activeScreen === 'history' ? colors.primaryContainer : colors.surfaceVariant,
+                  borderColor: activeScreen === 'history' ? colors.primary : colors.border,
+                },
+              ]}
+              onPress={onNavigateHistory}
+            >
+              <BookOpenText size={18} color={colors.spiritual} weight="bold" />
+              <Text style={[styles.navButtonText, { color: colors.text, fontSize: scaleFontSize(15) }]}>
+                {t.home.history}
+              </Text>
             </TouchableOpacity>
           </View>
 
