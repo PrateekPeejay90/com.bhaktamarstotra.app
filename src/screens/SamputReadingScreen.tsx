@@ -3,12 +3,10 @@ import {
   View,
   StyleSheet,
   Text,
-  TouchableOpacity,
   ScrollView,
   SafeAreaView
 } from 'react-native';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
-import { ArrowLeft, ArrowRight } from 'phosphor-react-native';
 import { dataService } from '../services/dataService';
 import { Verse } from '../types';
 import { useFontSize } from '../contexts/FontSizeContext';
@@ -16,6 +14,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { ScreenHeader } from '../components/ScreenHeader';
 import { CollapsibleSection } from '../components/CollapsibleSection';
+import { BottomNavigationBar } from '../components/BottomNavigationBar';
 
 interface SamputReadingScreenProps {
   samputVerseNumber: number;
@@ -90,8 +89,6 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
   const currentItem = samputSequence[currentIndex];
   const canGoPrevious = currentIndex > 0;
   const canGoNext = currentIndex < samputSequence.length - 1;
-  const previousNavColor = canGoPrevious ? colors.buttonText : colors.textSecondary;
-  const nextNavColor = canGoNext ? colors.buttonText : colors.textSecondary;
 
   const navigateToIndex = (direction: 'previous' | 'next') => {
     if (direction === 'previous' && canGoPrevious) {
@@ -238,59 +235,25 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
         </PanGestureHandler>
       </View>
 
-      {/* Navigation Controls */}
-      <View style={[styles.navigationContainer, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
-        <TouchableOpacity
-          style={[
-            styles.navButton, 
-            { backgroundColor: canGoPrevious ? colors.spiritual : colors.surface, borderColor: colors.border },
-            !canGoPrevious && styles.disabledNavButton
-          ]}
-          onPress={() => navigateToIndex('previous')}
-          disabled={!canGoPrevious}
-        >
-          <View style={styles.navButtonContent}>
-            <ArrowLeft size={18} color={previousNavColor} weight="bold" />
-            <Text style={[
-              styles.navButtonText,
-              { color: previousNavColor, fontSize: scaleFontSize(16) },
-              !canGoPrevious && styles.disabledNavButtonText
-            ]}>
-              {t.navigation.previous}
+      <BottomNavigationBar
+        canGoPrevious={canGoPrevious}
+        canGoNext={canGoNext}
+        onPrevious={() => navigateToIndex('previous')}
+        onNext={() => navigateToIndex('next')}
+        previousLabel={t.navigation.previous}
+        nextLabel={t.navigation.next}
+        buttonFontSize={scaleFontSize(16)}
+        centerContent={
+          <>
+            <Text style={[styles.progressText, { color: colors.text, fontSize: scaleFontSize(14) }]}>
+              {currentIndex + 1} / {samputSequence.length}
             </Text>
-          </View>
-        </TouchableOpacity>
-
-        <View style={styles.progressContainer}>
-          <Text style={[styles.progressText, { color: colors.text, fontSize: scaleFontSize(14) }]}>
-            {currentIndex + 1} / {samputSequence.length}
-          </Text>
-          <Text style={[styles.progressSubtext, { color: colors.textSecondary, fontSize: scaleFontSize(12) }]}>
-            {getVerseTypeLabel()}
-          </Text>
-        </View>
-
-        <TouchableOpacity
-          style={[
-            styles.navButton, 
-            { backgroundColor: canGoNext ? colors.spiritual : colors.surface, borderColor: colors.border },
-            !canGoNext && styles.disabledNavButton
-          ]}
-          onPress={() => navigateToIndex('next')}
-          disabled={!canGoNext}
-        >
-          <View style={styles.navButtonContent}>
-            <Text style={[
-              styles.navButtonText,
-              { color: nextNavColor, fontSize: scaleFontSize(16) },
-              !canGoNext && styles.disabledNavButtonText
-            ]}>
-              {t.navigation.next}
+            <Text style={[styles.progressSubtext, { color: colors.textSecondary, fontSize: scaleFontSize(12) }]}>
+              {getVerseTypeLabel()}
             </Text>
-            <ArrowRight size={18} color={nextNavColor} weight="bold" />
-          </View>
-        </TouchableOpacity>
-      </View>
+          </>
+        }
+      />
     </SafeAreaView>
   );
 };
@@ -361,49 +324,6 @@ const styles = StyleSheet.create({
   englishText: {
     color: '#444444',
     textAlign: 'justify',
-  },
-  navigationContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#ffffff',
-    borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 8,
-  },
-  navButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 8,
-    backgroundColor: '#8B4513',
-    minWidth: 100,
-    alignItems: 'center',
-  },
-  navButtonContent: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: 6,
-    justifyContent: 'center',
-  },
-  disabledNavButton: {
-    backgroundColor: '#cccccc',
-  },
-  navButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  disabledNavButtonText: {
-    color: '#999999',
-  },
-  progressContainer: {
-    alignItems: 'center',
   },
   progressText: {
     fontSize: 14,

@@ -13,6 +13,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { useFontSize } from '../contexts/FontSizeContext';
 import { SearchResult } from '../services/searchService';
 import { Verse } from '../types';
+import { uiPrimitives } from '../styles/uiPrimitives';
 
 interface SearchResultsProps {
   results: SearchResult[];
@@ -87,12 +88,16 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
   };
 
   const renderSearchResultCard = (item: SearchResult) => {
-    const { verse, matchedFields, relevanceScore } = item;
+    const { verse, matchedFields } = item;
 
     return (
       <TouchableOpacity
         key={`search-${verse.verse_number}`}
-        style={[styles.resultCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
+        style={[
+          uiPrimitives.elevatedCard,
+          styles.resultCard,
+          { backgroundColor: colors.surface, borderColor: colors.border },
+        ]}
         onPress={() => onVerseSelect(verse)}
       >
         {/* Verse Header */}
@@ -100,13 +105,6 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
           <Text style={[styles.verseNumber, { color: colors.spiritual, fontSize: scaleFontSize(16) }]}>
             {t.verseDetail.verse} {verse.verse_number}
           </Text>
-          {!embedded ? (
-            <View style={styles.relevanceContainer}>
-              <Text style={[styles.relevanceScore, { color: colors.textSecondary, fontSize: scaleFontSize(12) }]}>
-                {Math.round(relevanceScore)}% {t.search.match}
-              </Text>
-            </View>
-          ) : null}
         </View>
 
         {/* Matched Fields Indicators */}
@@ -287,13 +285,7 @@ const styles = StyleSheet.create({
   resultCard: {
     padding: 16,
     marginBottom: 12,
-    borderRadius: 12,
     borderWidth: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   resultHeader: {
     flexDirection: 'row',
@@ -304,15 +296,6 @@ const styles = StyleSheet.create({
   verseNumber: {
     fontSize: 16,
     fontWeight: '700',
-  },
-  relevanceContainer: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  relevanceScore: {
-    fontSize: 12,
-    fontWeight: '500',
   },
   matchedFieldsContainer: {
     flexDirection: 'row',

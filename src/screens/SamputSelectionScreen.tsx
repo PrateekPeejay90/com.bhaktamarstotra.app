@@ -16,8 +16,9 @@ import { ScreenHeader } from '../components/ScreenHeader';
 import { CollapsibleSection } from '../components/CollapsibleSection';
 import { SearchBar } from '../components/SearchBar';
 import { SearchResults } from '../components/SearchResults';
-import { searchService, SearchOptions, SearchResult } from '../services/searchService';
 import { Verse } from '../types';
+import { useVerseSearch } from '../hooks/useVerseSearch';
+import { uiPrimitives } from '../styles/uiPrimitives';
 
 interface SamputSelectionScreenProps {
   onBack: () => void;
@@ -34,42 +35,24 @@ export const SamputSelectionScreen: React.FC<SamputSelectionScreenProps> = ({
   const { t } = useLanguage();
   const { fontSizes, scaleFontSize } = useFontSize();
   const [selectedVerse, setSelectedVerse] = useState<string>('');
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-  const [currentSearchTerm, setCurrentSearchTerm] = useState('');
-  const [isSearching, setIsSearching] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
-  const [searchBarKey, setSearchBarKey] = useState(0);
+  const {
+    query,
+    setQuery,
+    searchResults,
+    activeSearchTerm,
+    isSearching,
+    hasSearched,
+    handleSearch,
+    clearSearch,
+  } = useVerseSearch({
+    delayMs: 200,
+    errorLabel: 'Samputt verse search error',
+  });
   const totalVerses = dataService.getTotalVerses();
 
   const handleVerseSelection = (verseNumber: string) => {
     setSelectedVerse(verseNumber);
-    handleClearSearch();
-    setSearchBarKey((currentKey) => currentKey + 1);
-  };
-
-  const handleVerseSearch = async (searchTerm: string, options: SearchOptions) => {
-    setIsSearching(true);
-    setCurrentSearchTerm(searchTerm);
-
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 200));
-
-      const results = searchService.searchVerses(searchTerm, options);
-      setSearchResults(results);
-      setHasSearched(true);
-    } catch (error) {
-      console.error('Samputt verse search error:', error);
-      setSearchResults([]);
-      setHasSearched(true);
-    } finally {
-      setIsSearching(false);
-    }
-  };
-
-  const handleClearSearch = () => {
-    setSearchResults([]);
-    setCurrentSearchTerm('');
-    setHasSearched(false);
+    clearSearch();
   };
 
   const handleSearchVerseSelect = (verse: Verse) => {
@@ -182,7 +165,13 @@ export const SamputSelectionScreen: React.FC<SamputSelectionScreenProps> = ({
           </View>
 
           {/* Verse Selection */}
-          <View style={[styles.selectionContainer, { backgroundColor: colors.surface }]}>
+          <View
+            style={[
+              uiPrimitives.elevatedCard,
+              styles.selectionContainer,
+              { backgroundColor: colors.surface },
+            ]}
+          >
             <Text style={[styles.selectionTitle, { color: colors.spiritual, fontSize: scaleFontSize(18) }]}>{t.samputt.selectVerse}</Text>
             <Text
               style={[
@@ -198,11 +187,11 @@ export const SamputSelectionScreen: React.FC<SamputSelectionScreenProps> = ({
             </Text>
 
             <SearchBar
-              key={searchBarKey}
-              onSearch={handleVerseSearch}
-              onClear={handleClearSearch}
+              onSearch={handleSearch}
+              onClear={clearSearch}
               placeholder={t.samputt.searchPlaceholder}
-              showAdvancedOptions={true}
+              value={query}
+              onChangeText={setQuery}
             />
 
             {renderQuickSelectButtons()}
@@ -211,7 +200,7 @@ export const SamputSelectionScreen: React.FC<SamputSelectionScreenProps> = ({
               <SearchResults
                 results={searchResults}
                 onVerseSelect={handleSearchVerseSelect}
-                searchTerm={currentSearchTerm}
+                searchTerm={activeSearchTerm}
                 loading={isSearching}
                 embedded
                 actionHint={t.samputt.tapToSelect}
@@ -222,7 +211,13 @@ export const SamputSelectionScreen: React.FC<SamputSelectionScreenProps> = ({
           {/* Preview */}
           {selectedVerse && !isNaN(parseInt(selectedVerse)) &&
           parseInt(selectedVerse) >= 1 && parseInt(selectedVerse) <= totalVerses ? (
-            <View style={[styles.previewContainer, { backgroundColor: colors.surface }]}>
+            <View
+              style={[
+                uiPrimitives.elevatedCard,
+                styles.previewContainer,
+                { backgroundColor: colors.surface },
+              ]}
+            >
               <Text style={[styles.previewTitle, { color: colors.spiritual, fontSize: scaleFontSize(16) }]}>
                 {t.samputt.selectedVersePreview}:
               </Text>
@@ -314,16 +309,9 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   selectionContainer: {
-    backgroundColor: '#ffffff',
     marginHorizontal: 16,
     marginVertical: 8,
     padding: 20,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   selectionTitle: {
     fontSize: 18,
@@ -373,16 +361,9 @@ const styles = StyleSheet.create({
     color: '#ffffff',
   },
   previewContainer: {
-    backgroundColor: '#ffffff',
     marginHorizontal: 16,
     marginVertical: 8,
     padding: 20,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   previewTitle: {
     fontSize: 16,

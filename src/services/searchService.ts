@@ -5,7 +5,6 @@ export interface SearchResult {
   verse: Verse;
   matchedFields: string[];
   matchedText: string[];
-  relevanceScore: number;
 }
 
 export interface SearchOptions {
@@ -18,13 +17,48 @@ export interface SearchOptions {
   exactMatch?: boolean;
 }
 
+export const DEFAULT_SEARCH_OPTIONS: Required<SearchOptions> = {
+  includeVerseNumbers: true,
+  includeSanskrit: true,
+  includeTransliteration: true,
+  includeHindi: true,
+  includeEnglish: true,
+  caseSensitive: false,
+  exactMatch: false,
+};
+
 class SearchService {
-  private readonly fieldWeightMap: Partial<Record<keyof Verse, number>> = {
-    content: 10,
-    english_meaning: 8,
-    hindi_meaning: 6,
-    transliteration: 4,
-  };
+  private readonly verseNumberQueryPattern = /^(?:verse|shlok|श्लोक)?\s*(\d{1,2})$/i;
+
+  private parseVerseNumberQuery(searchTerm: string): string | null {
+    const trimmedTerm = searchTerm.trim();
+    const match = trimmedTerm.match(this.verseNumberQueryPattern);
+
+    if (!match) {
+      return null;
+    }
+
+    const parsedNumber = Number(match[1]);
+    if (!Number.isFinite(parsedNumber) || parsedNumber <= 0) {
+      return null;
+    }
+
+    return parsedNumber.toString();
+  }
+
+  private searchByVerseNumber(searchDigits: string): SearchResult[] {
+    const verseMatches = dataService
+      .getAllVerses()
+      .filter((verse) => verse.verse_number !== undefined)
+      .filter((verse) => verse.verse_number!.toString().includes(searchDigits))
+      .sort((leftVerse, rightVerse) => leftVerse.verse_number! - rightVerse.verse_number!);
+
+    return verseMatches.map((verse) => ({
+      verse,
+      matchedFields: ['verse_number'],
+      matchedText: [`Verse ${verse.verse_number}`],
+    }));
+  }
 
   private normalizeText(text: string, caseSensitive: boolean = false): string {
     let normalized = text.trim();
@@ -36,47 +70,15 @@ class SearchService {
     return normalized;
   }
 
-  private calculateRelevanceScore(
-    searchTerm: string,
-    matchedText: string,
-    fieldName: keyof Verse
-  ): number {
-    const term = searchTerm.toLowerCase();
-    const text = matchedText.toLowerCase();
-    
-    let score = 0;
-    
-    // Exact match gets highest score
-    if (text === term) {
-      score += 100;
-    }
-    // Word boundary match
-    else if (text.includes(` ${term} `) || text.startsWith(`${term} `) || text.endsWith(` ${term}`)) {
-      score += 80;
-    }
-    // Partial match
-    else if (text.includes(term)) {
-      score += 50;
-    }
-    
-    score += this.fieldWeightMap[fieldName] ?? 0;
-    
-    // Boost score for shorter matches (more specific)
-    const lengthRatio = term.length / text.length;
-    score += lengthRatio * 20;
-    
-    return score;
-  }
-
   private searchInField(
     verse: Verse,
     fieldName: keyof Verse,
     searchTerm: string,
     options: SearchOptions
-  ): { matched: boolean; text: string; score: number } {
+  ): { matched: boolean; text: string } {
     const fieldValue = verse[fieldName];
     if (!fieldValue || typeof fieldValue !== 'string') {
-      return { matched: false, text: '', score: 0 };
+      return { matched: false, text: '' };
     }
 
     const normalizedField = this.normalizeText(fieldValue, options.caseSensitive);
@@ -89,11 +91,7 @@ class SearchService {
       matched = normalizedField.includes(normalizedTerm);
     }
 
-    const score = matched 
-      ? this.calculateRelevanceScore(normalizedTerm, normalizedField, fieldName)
-      : 0;
-
-    return { matched, text: fieldValue, score };
+    return { matched, text: fieldValue };
   }
 
   public searchVerses(
@@ -106,15 +104,17 @@ class SearchService {
 
     // Default options
     const searchOptions: SearchOptions = {
-      includeVerseNumbers: true,
-      includeSanskrit: true,
-      includeTransliteration: true,
-      includeHindi: true,
-      includeEnglish: true,
-      caseSensitive: false,
-      exactMatch: false,
-      ...options
+      ...DEFAULT_SEARCH_OPTIONS,
+      ...options,
     };
+
+    const directVerseNumberQuery = searchOptions.includeVerseNumbers
+      ? this.parseVerseNumberQuery(searchTerm)
+      : null;
+
+    if (directVerseNumberQuery) {
+      return this.searchByVerseNumber(directVerseNumberQuery);
+    }
 
     const allVerses = dataService.getAllVerses();
     const results: SearchResult[] = [];
@@ -122,7 +122,6 @@ class SearchService {
     for (const verse of allVerses) {
       const matchedFields: string[] = [];
       const matchedText: string[] = [];
-      let totalScore = 0;
 
       // Search in verse number
       if (searchOptions.includeVerseNumbers && verse.verse_number) {
@@ -130,7 +129,6 @@ class SearchService {
         if (verseNumStr.includes(searchTerm.trim())) {
           matchedFields.push('verse_number');
           matchedText.push(`Verse ${verseNumStr}`);
-          totalScore += 90; // High score for verse number matches
         }
       }
 
@@ -140,7 +138,6 @@ class SearchService {
         if (result.matched) {
           matchedFields.push('content');
           matchedText.push(result.text);
-          totalScore += result.score;
         }
       }
 
@@ -150,7 +147,6 @@ class SearchService {
         if (result.matched) {
           matchedFields.push('transliteration');
           matchedText.push(result.text);
-          totalScore += result.score;
         }
       }
 
@@ -160,7 +156,6 @@ class SearchService {
         if (result.matched) {
           matchedFields.push('hindi_meaning');
           matchedText.push(result.text);
-          totalScore += result.score;
         }
       }
 
@@ -170,7 +165,6 @@ class SearchService {
         if (result.matched) {
           matchedFields.push('english_meaning');
           matchedText.push(result.text);
-          totalScore += result.score;
         }
       }
 
@@ -180,13 +174,15 @@ class SearchService {
           verse,
           matchedFields,
           matchedText,
-          relevanceScore: totalScore
         });
       }
     }
 
-    // Sort by relevance score (highest first)
-    return results.sort((a, b) => b.relevanceScore - a.relevanceScore);
+    return results.sort(
+      (leftResult, rightResult) =>
+        (leftResult.verse.verse_number ?? Number.MAX_SAFE_INTEGER) -
+        (rightResult.verse.verse_number ?? Number.MAX_SAFE_INTEGER),
+    );
   }
 
   public getSearchSuggestions(partialTerm: string, limit: number = 5): string[] {

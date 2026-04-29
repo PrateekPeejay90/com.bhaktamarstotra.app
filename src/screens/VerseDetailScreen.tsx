@@ -1,14 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  StyleSheet, 
-  Text, 
-  TouchableOpacity, 
-  ScrollView,
-  SafeAreaView 
-} from 'react-native';
+import { View, StyleSheet, Text, ScrollView, SafeAreaView } from 'react-native';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
-import { ArrowLeft, ArrowRight } from 'phosphor-react-native';
 import { dataService } from '../services/dataService';
 import { Verse } from '../types';
 import { useFontSize } from '../contexts/FontSizeContext';
@@ -16,6 +8,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { ScreenHeader } from '../components/ScreenHeader';
 import { CollapsibleSection } from '../components/CollapsibleSection';
+import { BottomNavigationBar } from '../components/BottomNavigationBar';
 
 interface VerseDetailScreenProps {
   verse: Verse;
@@ -40,8 +33,6 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
   const totalVerses = dataService.getTotalVerses();
   const canGoPrevious = currentVerse.verse_number! > 1;
   const canGoNext = currentVerse.verse_number! < totalVerses;
-  const previousNavColor = canGoPrevious ? colors.buttonText : colors.textSecondary;
-  const nextNavColor = canGoNext ? colors.buttonText : colors.textSecondary;
 
   useEffect(() => {
     setCurrentVerse(verse);
@@ -176,56 +167,20 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
         </PanGestureHandler>
       </View>
 
-      {/* Navigation Controls */}
-      <View style={[styles.navigationContainer, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
-        <TouchableOpacity
-          style={[
-            styles.navButton, 
-            { backgroundColor: canGoPrevious ? colors.spiritual : colors.surface, borderColor: colors.border },
-            !canGoPrevious && styles.disabledNavButton
-          ]}
-          onPress={() => navigateToVerse('previous')}
-          disabled={!canGoPrevious}
-        >
-          <View style={styles.navButtonContent}>
-            <ArrowLeft size={18} color={previousNavColor} weight="bold" />
-            <Text style={[
-              styles.navButtonText,
-              { color: previousNavColor, fontSize: scaleFontSize(16) },
-              !canGoPrevious && styles.disabledNavButtonText
-            ]}>
-              {t.navigation.previous}
-            </Text>
-          </View>
-        </TouchableOpacity>
-
-        <View style={styles.progressContainer}>
+      <BottomNavigationBar
+        canGoPrevious={canGoPrevious}
+        canGoNext={canGoNext}
+        onPrevious={() => navigateToVerse('previous')}
+        onNext={() => navigateToVerse('next')}
+        previousLabel={t.navigation.previous}
+        nextLabel={t.navigation.next}
+        buttonFontSize={scaleFontSize(16)}
+        centerContent={
           <Text style={[styles.progressText, { color: colors.text, fontSize: scaleFontSize(14) }]}>
             {currentVerse.verse_number} / {totalVerses}
           </Text>
-        </View>
-
-        <TouchableOpacity
-          style={[
-            styles.navButton, 
-            { backgroundColor: canGoNext ? colors.spiritual : colors.surface, borderColor: colors.border },
-            !canGoNext && styles.disabledNavButton
-          ]}
-          onPress={() => navigateToVerse('next')}
-          disabled={!canGoNext}
-        >
-          <View style={styles.navButtonContent}>
-            <Text style={[
-              styles.navButtonText,
-              { color: nextNavColor, fontSize: scaleFontSize(16) },
-              !canGoNext && styles.disabledNavButtonText
-            ]}>
-              {t.navigation.next}
-            </Text>
-            <ArrowRight size={18} color={nextNavColor} weight="bold" />
-          </View>
-        </TouchableOpacity>
-      </View>
+        }
+      />
     </SafeAreaView>
   );
 };
@@ -285,49 +240,6 @@ const styles = StyleSheet.create({
   translationsContainer: {
     paddingHorizontal: 12,
     gap: 16,
-  },
-  navigationContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#ffffff',
-    borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 8,
-  },
-  navButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 8,
-    backgroundColor: '#8B4513',
-    minWidth: 100,
-    alignItems: 'center',
-  },
-  navButtonContent: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: 6,
-    justifyContent: 'center',
-  },
-  disabledNavButton: {
-    backgroundColor: '#cccccc',
-  },
-  navButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  disabledNavButtonText: {
-    color: '#999999',
-  },
-  progressContainer: {
-    alignItems: 'center',
   },
   progressText: {
     fontSize: 14,

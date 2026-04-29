@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   StyleSheet,
   SafeAreaView,
@@ -11,8 +11,8 @@ import { useFontSize } from '../contexts/FontSizeContext';
 import { SearchBar } from '../components/SearchBar';
 import { SearchResults } from '../components/SearchResults';
 import { ScreenHeader } from '../components/ScreenHeader';
-import { searchService, SearchResult, SearchOptions } from '../services/searchService';
 import { Verse } from '../types';
+import { useVerseSearch } from '../hooks/useVerseSearch';
 
 interface SearchScreenProps {
   onBack: () => void;
@@ -28,35 +28,16 @@ export const SearchScreen: React.FC<SearchScreenProps> = ({
   const { colors } = useTheme();
   const { t } = useLanguage();
   const { scaleFontSize } = useFontSize();
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-  const [currentSearchTerm, setCurrentSearchTerm] = useState('');
-  const [isSearching, setIsSearching] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
-
-  const handleSearch = async (searchTerm: string, options: SearchOptions) => {
-    setIsSearching(true);
-    setCurrentSearchTerm(searchTerm);
-    
-    try {
-      // Add small delay to show loading state
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
-      const results = searchService.searchVerses(searchTerm, options);
-      setSearchResults(results);
-      setHasSearched(true);
-    } catch (error) {
-      console.error('Search error:', error);
-      setSearchResults([]);
-    } finally {
-      setIsSearching(false);
-    }
-  };
-
-  const handleClear = () => {
-    setSearchResults([]);
-    setCurrentSearchTerm('');
-    setHasSearched(false);
-  };
+  const {
+    query,
+    setQuery,
+    searchResults,
+    activeSearchTerm,
+    isSearching,
+    hasSearched,
+    handleSearch,
+    clearSearch,
+  } = useVerseSearch();
 
   const renderContent = () => {
     if (!hasSearched && !isSearching) {
@@ -89,12 +70,12 @@ export const SearchScreen: React.FC<SearchScreenProps> = ({
     }
 
     return (
-      <SearchResults
-        results={searchResults}
-        onVerseSelect={onVerseSelect}
-        searchTerm={currentSearchTerm}
-        loading={isSearching}
-      />
+        <SearchResults
+          results={searchResults}
+          onVerseSelect={onVerseSelect}
+          searchTerm={activeSearchTerm}
+          loading={isSearching}
+        />
     );
   };
 
@@ -112,9 +93,10 @@ export const SearchScreen: React.FC<SearchScreenProps> = ({
       <View style={styles.searchContainer}>
         <SearchBar
           onSearch={handleSearch}
-          onClear={handleClear}
+          onClear={clearSearch}
           placeholder={t.search.placeholder}
-          showAdvancedOptions={true}
+          value={query}
+          onChangeText={setQuery}
         />
       </View>
 
@@ -131,6 +113,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   searchContainer: {
+    marginTop: 12,
     paddingHorizontal: 20,
     paddingBottom: 16,
   },
