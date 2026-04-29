@@ -55,6 +55,10 @@ export interface Translations {
     examplePattern: string;
     exampleSequence: string;
     chooseVerseNumber: string;
+    searchByWords: string;
+    searchHelp: string;
+    searchPlaceholder: string;
+    tapToSelect: string;
     selectedVersePreview: string;
   };
   search: {
@@ -163,6 +167,10 @@ export const translations: Record<LanguageCode, Translations> = {
       examplePattern: 'Example Pattern',
       exampleSequence: 'Select verse 20 -> Pattern: 1->20->2->20->3->20...->48->20',
       chooseVerseNumber: 'Choose a verse number',
+      searchByWords: 'Search Verse By Words',
+      searchHelp: 'Search by verse number or by words from the verse, transliteration, or meaning.',
+      searchPlaceholder: 'Enter verse number or search for Samputt...',
+      tapToSelect: 'Tap to select this verse for Samputt',
       selectedVersePreview: 'Selected Verse Preview',
     },
     search: {
@@ -269,6 +277,10 @@ export const translations: Record<LanguageCode, Translations> = {
       examplePattern: 'उदाहरण क्रम',
       exampleSequence: 'श्लोक 20 चुनें -> क्रम: 1->20->2->20->3->20...->48->20',
       chooseVerseNumber: 'एक श्लोक संख्या चुनें',
+      searchByWords: 'शब्दों से श्लोक खोजें',
+      searchHelp: 'श्लोक संख्या या श्लोक, लिप्यंतरण अथवा अर्थ के शब्दों से खोजें।',
+      searchPlaceholder: 'श्लोक संख्या दर्ज करें या खोजें...',
+      tapToSelect: 'संपुट के लिए यह श्लोक चुनने हेतु टैप करें',
       selectedVersePreview: 'चयनित श्लोक पूर्वावलोकन',
     },
     search: {
