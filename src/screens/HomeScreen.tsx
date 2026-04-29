@@ -9,10 +9,11 @@ import {
 } from "react-native";
 import { List, MagnifyingGlass } from "phosphor-react-native";
 import { dataService } from "../services/dataService";
-import { BhaktamarData, Verse } from "../types";
+import { BhaktamarData } from "../types";
 import { useTheme } from "../contexts/ThemeContext";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useFontSize } from "../contexts/FontSizeContext";
+import { componentRecipes } from "../styles/componentRecipes";
 
 interface HomeScreenProps {
   onStartReading: () => void;
@@ -91,6 +92,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           <View style={styles.headerControls}>
             <TouchableOpacity
               style={[
+                componentRecipes.compactOutlineIconButton,
                 styles.iconButton,
                 { backgroundColor: colors.surface, borderColor: colors.border },
               ]}
@@ -101,6 +103,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
             <TouchableOpacity
               style={[
+                componentRecipes.compactOutlineIconButton,
                 styles.iconButton,
                 { backgroundColor: colors.surface, borderColor: colors.border },
               ]}
@@ -126,11 +129,16 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           {/* Action Buttons */}
           <View style={styles.buttonContainer}>
             <TouchableOpacity
-              style={[styles.button, { backgroundColor: colors.button }]}
+              style={[
+                componentRecipes.actionButton,
+                styles.button,
+                { backgroundColor: colors.button },
+              ]}
               onPress={handleStartReading}
             >
               <Text
                 style={[
+                  componentRecipes.buttonLabelBold,
                   styles.primaryButtonText,
                   { color: colors.buttonText, fontSize: scaleFontSize(18) },
                 ]}
@@ -141,6 +149,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
             <TouchableOpacity
               style={[
+                componentRecipes.actionButton,
                 styles.button,
                 styles.secondaryButton,
                 { borderColor: colors.spiritual },
@@ -149,6 +158,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             >
               <Text
                 style={[
+                  componentRecipes.buttonLabelBold,
                   styles.secondaryButtonText,
                   { color: colors.spiritual, fontSize: scaleFontSize(18) },
                 ]}
@@ -159,6 +169,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
             <TouchableOpacity
               style={[
+                componentRecipes.actionButton,
                 styles.button,
                 styles.samputButton,
                 {
@@ -170,6 +181,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             >
               <Text
                 style={[
+                  componentRecipes.buttonLabelBold,
                   styles.samputButtonText,
                   { color: colors.spiritual, fontSize: scaleFontSize(18) },
                 ]}
@@ -180,6 +192,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
             <TouchableOpacity
               style={[
+                componentRecipes.actionButton,
                 styles.button,
                 styles.historyButton,
                 { backgroundColor: colors.surface, borderColor: colors.border },
@@ -188,6 +201,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             >
               <Text
                 style={[
+                  componentRecipes.buttonLabelSemibold,
                   styles.historyButtonText,
                   { color: colors.text, fontSize: scaleFontSize(18) },
                 ]}
@@ -205,7 +219,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8f6f0",
   },
   content: {
     padding: 20,
@@ -214,7 +227,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f8f6f0",
   },
   loadingText: {
     fontSize: 16,
@@ -225,13 +237,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 20,
   },
-  iconButton: {
-    padding: 8,
-    borderRadius: 10,
-    borderWidth: 1,
-    backgroundColor: "#ffffff",
-    borderColor: "#E0E0E0",
-  },
+  iconButton: {},
   titleSection: {
     alignItems: "center",
     marginBottom: 48,
@@ -242,118 +248,22 @@ const styles = StyleSheet.create({
     height: 184,
     marginBottom: 18,
   },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 18,
-    textAlign: "center",
-    marginBottom: 8,
-  },
-  author: {
-    fontSize: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: "600",
-    color: "#8B4513",
-    marginBottom: 12,
-    textAlign: "center",
-  },
-  verseCard: {
-    padding: 16,
-    backgroundColor: "#ffffff",
-    borderRadius: 12,
-    marginBottom: 24,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  verseNumber: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#8B4513",
-    marginBottom: 8,
-    textAlign: "center",
-  },
-  sanskritText: {
-    fontSize: 16,
-    color: "#2F4F4F",
-    lineHeight: 24,
-    marginBottom: 12,
-    fontFamily: "serif",
-  },
-  transliterationText: {
-    fontSize: 14,
-    fontStyle: "italic",
-    color: "#666",
-    marginBottom: 8,
-    lineHeight: 20,
-  },
-  hindiText: {
-    fontSize: 14,
-    color: "#444",
-    marginBottom: 8,
-    lineHeight: 20,
-  },
-  englishText: {
-    fontSize: 14,
-    color: "#444",
-    marginBottom: 8,
-    lineHeight: 20,
-  },
   buttonContainer: {
     gap: 12,
   },
-  button: {
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  primaryButton: {
-    backgroundColor: "#8B4513",
-  },
+  button: {},
   secondaryButton: {
     backgroundColor: "transparent",
-    borderWidth: 2,
-    borderColor: "#8B4513",
+    ...componentRecipes.outlineActionButton,
   },
-  primaryButtonText: {
-    color: "#ffffff",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  secondaryButtonText: {
-    color: "#8B4513",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
+  primaryButtonText: {},
+  secondaryButtonText: {},
   samputButton: {
-    backgroundColor: "#F5DEB3",
-    borderWidth: 2,
-    borderColor: "#8B4513",
+    ...componentRecipes.outlineActionButton,
   },
-  samputButtonText: {
-    color: "#8B4513",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
+  samputButtonText: {},
   historyButton: {
-    borderWidth: 1,
+    ...componentRecipes.subtleActionButton,
   },
-  historyButtonText: {
-    fontSize: 18,
-    fontWeight: "600",
-  },
+  historyButtonText: {},
 });

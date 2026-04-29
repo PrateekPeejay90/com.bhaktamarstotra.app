@@ -4,6 +4,7 @@ import { Globe, CaretDown, CaretUp, Check } from 'phosphor-react-native';
 import { useLanguage, LanguageCode } from '../contexts/LanguageContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useFontSize } from '../contexts/FontSizeContext';
+import { componentRecipes } from '../styles/componentRecipes';
 
 export const LanguageMenu: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -44,11 +45,12 @@ export const LanguageMenu: React.FC = () => {
 
       {/* Expandable Content */}
       {isExpanded && (
-        <View style={styles.expandedContent}>
+        <View style={[componentRecipes.drawerSectionTight, styles.expandedContent]}>
           {languages.map((lang) => (
             <TouchableOpacity
               key={lang.code}
               style={[
+                componentRecipes.selectionOptionButton,
                 styles.languageOption,
                 { backgroundColor: colors.surface, borderColor: colors.border },
                 language === lang.code && { backgroundColor: colors.accent, borderColor: colors.spiritual }
@@ -58,6 +60,7 @@ export const LanguageMenu: React.FC = () => {
               <View style={styles.languageInfo}>
                 <Text
                   style={[
+                    componentRecipes.selectionOptionLabel,
                     styles.languageLabel,
                     { color: language === lang.code ? colors.spiritual : colors.text, fontSize: scaleFontSize(16) }
                   ]}
@@ -66,6 +69,7 @@ export const LanguageMenu: React.FC = () => {
                 </Text>
                 <Text
                   style={[
+                    componentRecipes.selectionOptionSubLabel,
                     styles.languageSubLabel,
                     { color: language === lang.code ? colors.spiritual : colors.textSecondary, fontSize: scaleFontSize(12) }
                   ]}
@@ -113,28 +117,12 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   expandedContent: {
-    paddingHorizontal: 16,
-    paddingBottom: 16,
     gap: 8,
   },
-  languageOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 16,
-    borderRadius: 10,
-    borderWidth: 2,
-  },
+  languageOption: {},
   languageInfo: {
     flex: 1,
   },
-  languageLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 2,
-  },
-  languageSubLabel: {
-    fontSize: 12,
-    fontWeight: '400',
-  },
+  languageLabel: {},
+  languageSubLabel: {},
 });

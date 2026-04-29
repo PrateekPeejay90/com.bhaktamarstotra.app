@@ -4,6 +4,7 @@ import { TextAa, Minus, Plus, CaretDown, CaretUp } from 'phosphor-react-native';
 import { useFontSize } from '../contexts/FontSizeContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { componentRecipes } from '../styles/componentRecipes';
 
 export const FontSizeMenu: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -40,9 +41,15 @@ export const FontSizeMenu: React.FC = () => {
 
       {/* Expandable Content */}
       {isExpanded && (
-        <View style={styles.expandedContent}>
+        <View style={[componentRecipes.drawerSectionTight, styles.expandedContent]}>
           {/* Preview Text */}
-          <View style={[styles.previewContainer, { backgroundColor: colors.background, borderColor: colors.border }]}>
+          <View
+            style={[
+              componentRecipes.previewPanel,
+              styles.previewContainer,
+              { backgroundColor: colors.background, borderColor: colors.border },
+            ]}
+          >
             <Text style={[styles.previewLabel, { color: colors.textSecondary, fontSize: scaleFontSize(12) }]}>{t.menu.preview}</Text>
             <Text style={[styles.previewSanskrit, { color: colors.text, fontSize: fontSizes.sanskrit }]}>
               भक्तामर स्तोत्र
@@ -56,6 +63,7 @@ export const FontSizeMenu: React.FC = () => {
           <View style={styles.controlsRow}>
             <TouchableOpacity
               style={[
+                componentRecipes.controlButton,
                 styles.controlButton,
                 { backgroundColor: colors.surface, borderColor: colors.border },
                 !canDecrease && styles.disabledButton
@@ -69,6 +77,7 @@ export const FontSizeMenu: React.FC = () => {
 
             <TouchableOpacity
               style={[
+                componentRecipes.controlButton,
                 styles.controlButton,
                 { backgroundColor: colors.surface, borderColor: colors.border },
                 !canIncrease && styles.disabledButton
@@ -115,15 +124,9 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   expandedContent: {
-    paddingHorizontal: 16,
-    paddingBottom: 16,
   },
   previewContainer: {
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
     marginBottom: 16,
-    alignItems: 'center',
   },
   previewLabel: {
     fontSize: 12,
@@ -144,21 +147,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: 12,
   },
-  controlButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    padding: 12,
-    borderRadius: 10,
-    borderWidth: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
+  controlButton: {},
   disabledButton: {
     opacity: 0.4,
   },

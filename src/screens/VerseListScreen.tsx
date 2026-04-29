@@ -16,6 +16,7 @@ import { useTheme } from "../contexts/ThemeContext";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useFontSize } from "../contexts/FontSizeContext";
 import { ScreenHeader } from "../components/ScreenHeader";
+import { componentRecipes } from "../styles/componentRecipes";
 
 interface VerseListScreenProps {
   onVerseSelect: (verse: Verse) => void;
@@ -71,7 +72,7 @@ export const VerseListScreen: React.FC<VerseListScreenProps> = ({
 
   const renderVerseItem = ({ item }: { item: Verse }) => (
     <TouchableOpacity
-      style={[styles.verseItem, { backgroundColor: colors.surface }]}
+      style={[styles.verseItem, { backgroundColor: colors.surface, borderColor: colors.border }]}
       onPress={() => onVerseSelect(item)}
     >
       <View style={styles.verseHeader}>
@@ -116,6 +117,7 @@ export const VerseListScreen: React.FC<VerseListScreenProps> = ({
       <View style={styles.searchContainer}>
         <TextInput
           style={[
+            componentRecipes.surfaceTextInput,
             styles.searchInput,
             {
               backgroundColor: colors.surface,
@@ -134,6 +136,7 @@ export const VerseListScreen: React.FC<VerseListScreenProps> = ({
         {directVerse ? (
           <TouchableOpacity
             style={[
+              componentRecipes.inlineActionButton,
               styles.directVerseButton,
               { backgroundColor: colors.spiritual },
             ]}
@@ -167,54 +170,22 @@ export const VerseListScreen: React.FC<VerseListScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8f6f0",
   },
   searchContainer: {
     padding: 16,
     gap: 10,
   },
-  searchInput: {
-    backgroundColor: "#ffffff",
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
-  },
-  directVerseButton: {
-    alignItems: "center",
-    borderRadius: 10,
-    flexDirection: "row",
-    gap: 6,
-    justifyContent: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
+  searchInput: {},
+  directVerseButton: {},
   directVerseButtonText: {
     fontWeight: "700",
-  },
-  resultsCount: {
-    paddingHorizontal: 16,
-    paddingBottom: 8,
-    fontSize: 14,
-    color: "#666666",
   },
   listContainer: {
     padding: 16,
     gap: 12,
   },
   verseItem: {
-    backgroundColor: "#ffffff",
-    // borderRadius: 12,
-    borderBottomWidth: 1,
-    borderColor: "#e0e0e0",
-    padding: 8,
-    // shadowColor: "#000",
-    // shadowOffset: { width: 0, height: 2 },
-    // shadowOpacity: 0.1,
-    // shadowRadius: 4,
-    // elevation: 3,
+    ...componentRecipes.listRowCard,
   },
   verseHeader: {
     flexDirection: "row",
@@ -225,28 +196,11 @@ const styles = StyleSheet.create({
   verseNumber: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#8B4513",
-  },
-  pageNumber: {
-    fontSize: 12,
-    color: "#999999",
   },
   sanskritPreview: {
     fontSize: 16,
-    color: "#2F4F4F",
     lineHeight: 24,
     marginBottom: 8,
     fontFamily: "serif",
-  },
-  transliterationPreview: {
-    fontSize: 14,
-    color: "#696969",
-    fontStyle: "italic",
-    marginBottom: 8,
-  },
-  meaningPreview: {
-    fontSize: 14,
-    color: "#555555",
-    lineHeight: 20,
   },
 });

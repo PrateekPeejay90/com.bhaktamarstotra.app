@@ -14,6 +14,7 @@ import { useTheme } from "../contexts/ThemeContext";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useFontSize } from "../contexts/FontSizeContext";
 import { PRIVACY_POLICY_URL } from "../constants/appInfo";
+import { componentRecipes } from "../styles/componentRecipes";
 import { FontSizeMenu } from "./FontSizeMenu";
 import { LanguageMenu } from "./LanguageMenu";
 
@@ -96,6 +97,7 @@ export const MenuDrawer: React.FC<MenuDrawerProps> = ({
       <Animated.View
         style={[
           styles.drawer,
+          componentRecipes.drawerPanel,
           {
             backgroundColor: colors.surface,
             borderRightColor: colors.border,
@@ -114,12 +116,14 @@ export const MenuDrawer: React.FC<MenuDrawerProps> = ({
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           <View
             style={[
+              componentRecipes.drawerSection,
               styles.navigationGroup,
               { borderBottomColor: colors.border },
             ]}
           >
             <Text
               style={[
+                componentRecipes.drawerSectionTitle,
                 styles.sectionTitle,
                 { color: colors.textSecondary, fontSize: scaleFontSize(12) },
               ]}
@@ -128,7 +132,7 @@ export const MenuDrawer: React.FC<MenuDrawerProps> = ({
             </Text>
 
             <TouchableOpacity
-              style={[styles.navButton]}
+              style={[componentRecipes.drawerRowButton, styles.navButton]}
               onPress={onNavigateHome}
             >
               <House size={18} color={colors.spiritual} weight="bold" />
@@ -143,7 +147,7 @@ export const MenuDrawer: React.FC<MenuDrawerProps> = ({
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.navButton]}
+              style={[componentRecipes.drawerRowButton, styles.navButton]}
               onPress={onNavigateHistory}
             >
               <BookOpenText size={18} color={colors.spiritual} weight="bold" />
@@ -162,10 +166,14 @@ export const MenuDrawer: React.FC<MenuDrawerProps> = ({
           <FontSizeMenu />
 
           <View
-            style={[styles.privacyGroup, { borderBottomColor: colors.border }]}
+            style={[
+              componentRecipes.drawerSection,
+              styles.privacyGroup,
+              { borderBottomColor: colors.border },
+            ]}
           >
             <TouchableOpacity
-              style={[styles.privacyLinkButton]}
+              style={[componentRecipes.drawerSplitRowButton, styles.privacyLinkButton]}
               onPress={handleOpenPrivacyPolicy}
             >
               <Text
@@ -205,11 +213,6 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     borderRightWidth: 1,
-    shadowColor: "#000",
-    shadowOffset: { width: 4, height: 0 },
-    shadowOpacity: 0.15,
-    shadowRadius: 14,
-    elevation: 24,
     zIndex: 1000,
   },
   header: {
@@ -235,40 +238,18 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   navigationGroup: {
-    padding: 16,
-    borderBottomWidth: 1,
     gap: 10,
   },
-  sectionTitle: {
-    fontSize: 12,
-    fontWeight: "700",
-    textTransform: "uppercase",
-    letterSpacing: 0.8,
-    marginBottom: 2,
-  },
-  navButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-  },
+  sectionTitle: {},
+  navButton: {},
   navButtonText: {
     fontSize: 15,
     fontWeight: "600",
   },
   privacyGroup: {
-    borderBottomWidth: 1,
-    padding: 16,
     gap: 8,
   },
-  privacyLinkButton: {
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-  },
+  privacyLinkButton: {},
   privacyLinkText: {
     fontSize: 15,
     fontWeight: "600",
