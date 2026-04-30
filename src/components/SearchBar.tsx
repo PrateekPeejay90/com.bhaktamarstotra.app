@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   TextInput,
@@ -7,41 +7,44 @@ import {
   StyleSheet,
   FlatList,
 } from 'react-native';
-import { Faders } from 'phosphor-react-native';
 import { useTheme } from '../contexts/ThemeContext';
 import { useFontSize } from '../contexts/FontSizeContext';
 import { useLanguage } from '../contexts/LanguageContext';
-import { searchService, SearchOptions } from '../services/searchService';
+import { searchService } from '../services/searchService';
+import { uiPrimitives } from '../styles/uiPrimitives';
 
 interface SearchBarProps {
-  onSearch: (searchTerm: string, options: SearchOptions) => void;
+  onSearch: (searchTerm: string) => void;
   onClear: () => void;
   placeholder?: string;
-  showAdvancedOptions?: boolean;
+  value?: string;
+  onChangeText?: (value: string) => void;
 }
 
 export const SearchBar: React.FC<SearchBarProps> = ({
   onSearch,
   onClear,
   placeholder,
-  showAdvancedOptions = false
+  value,
+  onChangeText,
 }) => {
   const { colors } = useTheme();
   const { scaleFontSize } = useFontSize();
   const { t } = useLanguage();
-  const [searchTerm, setSearchTerm] = useState('');
+  const [internalSearchTerm, setInternalSearchTerm] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [showOptions, setShowOptions] = useState(false);
-  const [searchOptions, setSearchOptions] = useState<SearchOptions>({
-    includeSanskrit: true,
-    includeTransliteration: true,
-    includeHindi: true,
-    includeEnglish: true,
-    includeVerseNumbers: true,
-    caseSensitive: false,
-    exactMatch: false,
-  });
+  const lastEmittedSearchTermRef = useRef('');
+  const searchTerm = value ?? internalSearchTerm;
+
+  const setSearchTerm = (nextValue: string) => {
+    if (onChangeText) {
+      onChangeText(nextValue);
+      return;
+    }
+
+    setInternalSearchTerm(nextValue);
+  };
 
   useEffect(() => {
     if (searchTerm.length >= 2) {
@@ -54,13 +57,26 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     }
   }, [searchTerm]);
 
-  const handleSearch = (term?: string) => {
-    const finalTerm = term || searchTerm;
-    if (finalTerm.trim()) {
-      onSearch(finalTerm.trim(), searchOptions);
-      setShowSuggestions(false);
+  useEffect(() => {
+    const trimmedSearchTerm = searchTerm.trim();
+
+    if (!trimmedSearchTerm) {
+      lastEmittedSearchTermRef.current = '';
+      onClear();
+      return;
     }
-  };
+
+    const timeoutId = setTimeout(() => {
+      if (lastEmittedSearchTermRef.current === trimmedSearchTerm) {
+        return;
+      }
+
+      lastEmittedSearchTermRef.current = trimmedSearchTerm;
+      onSearch(trimmedSearchTerm);
+    }, 250);
+
+    return () => clearTimeout(timeoutId);
+  }, [onClear, onSearch, searchTerm]);
 
   const handleClear = () => {
     setSearchTerm('');
@@ -72,28 +88,25 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   const handleSuggestionPress = (suggestion: string) => {
     setSearchTerm(suggestion);
     setShowSuggestions(false);
-    handleSearch(suggestion);
-  };
-
-  const toggleOption = (option: keyof SearchOptions) => {
-    setSearchOptions(prev => ({
-      ...prev,
-      [option]: !prev[option]
-    }));
   };
 
   return (
     <View style={styles.container}>
       {/* Search Input */}
-      <View style={[styles.searchInputContainer, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+      <View
+        style={[
+          uiPrimitives.elevatedCard,
+          styles.searchInputContainer,
+          { backgroundColor: colors.surface, borderColor: colors.border },
+        ]}
+      >
         <TextInput
           style={[styles.searchInput, { color: colors.text, fontSize: scaleFontSize(16) }]}
           value={searchTerm}
           onChangeText={setSearchTerm}
           placeholder={placeholder ?? t.search.placeholder}
           placeholderTextColor={colors.textSecondary}
-          onSubmitEditing={() => handleSearch()}
-          returnKeyType="search"
+          returnKeyType="done"
         />
         
         {searchTerm.length > 0 && (
@@ -104,92 +117,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             <Text style={[styles.clearButtonText, { color: colors.textSecondary, fontSize: scaleFontSize(16) }]}>✕</Text>
           </TouchableOpacity>
         )}
-        
-        {showAdvancedOptions && (
-          <TouchableOpacity
-            style={[styles.filterButton, showOptions && { backgroundColor: colors.accent }]}
-            onPress={() => setShowOptions(!showOptions)}
-          >
-            <Faders size={20} color={colors.spiritual} weight="bold" />
-          </TouchableOpacity>
-        )}
-        
-        <TouchableOpacity
-          style={[styles.searchButton, { backgroundColor: colors.spiritual }]}
-          onPress={() => handleSearch()}
-        >
-          <Text style={[styles.searchButtonText, { color: colors.buttonText, fontSize: scaleFontSize(16) }]}>🔍</Text>
-        </TouchableOpacity>
       </View>
-
-      {/* Advanced Options Panel */}
-      {showOptions && (
-        <View style={[styles.optionsPanel, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <Text style={[styles.optionsSectionTitle, { color: colors.text, fontSize: scaleFontSize(16) }]}>
-            {t.search.searchIn}:
-          </Text>
-          
-          <View style={styles.optionsRow}>
-            <TouchableOpacity
-              style={[styles.optionButton, searchOptions.includeSanskrit && { backgroundColor: colors.accent }]}
-              onPress={() => toggleOption('includeSanskrit')}
-            >
-              <Text style={[styles.optionButtonText, { color: searchOptions.includeSanskrit ? colors.spiritual : colors.textSecondary, fontSize: scaleFontSize(14) }]}>
-                {t.verseDetail.sanskrit}
-              </Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity
-              style={[styles.optionButton, searchOptions.includeTransliteration && { backgroundColor: colors.accent }]}
-              onPress={() => toggleOption('includeTransliteration')}
-            >
-              <Text style={[styles.optionButtonText, { color: searchOptions.includeTransliteration ? colors.spiritual : colors.textSecondary, fontSize: scaleFontSize(14) }]}>
-                {t.verseDetail.transliteration}
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.optionsRow}>
-            <TouchableOpacity
-              style={[styles.optionButton, searchOptions.includeHindi && { backgroundColor: colors.accent }]}
-              onPress={() => toggleOption('includeHindi')}
-            >
-              <Text style={[styles.optionButtonText, { color: searchOptions.includeHindi ? colors.spiritual : colors.textSecondary, fontSize: scaleFontSize(14) }]}>
-                {t.verseDetail.hindi}
-              </Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity
-              style={[styles.optionButton, searchOptions.includeEnglish && { backgroundColor: colors.accent }]}
-              onPress={() => toggleOption('includeEnglish')}
-            >
-              <Text style={[styles.optionButtonText, { color: searchOptions.includeEnglish ? colors.spiritual : colors.textSecondary, fontSize: scaleFontSize(14) }]}>
-                {t.verseDetail.english}
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.optionsRow}>
-            <TouchableOpacity
-              style={[styles.optionButton, searchOptions.caseSensitive && { backgroundColor: colors.accent }]}
-              onPress={() => toggleOption('caseSensitive')}
-            >
-              <Text style={[styles.optionButtonText, { color: searchOptions.caseSensitive ? colors.spiritual : colors.textSecondary, fontSize: scaleFontSize(14) }]}>
-                {t.search.caseSensitive}
-              </Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity
-              style={[styles.optionButton, searchOptions.exactMatch && { backgroundColor: colors.accent }]}
-              onPress={() => toggleOption('exactMatch')}
-            >
-              <Text style={[styles.optionButtonText, { color: searchOptions.exactMatch ? colors.spiritual : colors.textSecondary, fontSize: scaleFontSize(14) }]}>
-                {t.search.exactMatch}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      )}
 
       {/* Search Suggestions */}
       {showSuggestions && (
@@ -223,14 +151,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   searchInput: {
     flex: 1,
@@ -244,46 +166,6 @@ const styles = StyleSheet.create({
   clearButtonText: {
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  searchButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
-  },
-  searchButtonText: {
-    fontSize: 16,
-  },
-  filterButton: {
-    padding: 8,
-    borderRadius: 8,
-    marginRight: 8,
-  },
-  optionsPanel: {
-    marginTop: 8,
-    padding: 16,
-    borderWidth: 1,
-    borderRadius: 12,
-  },
-  optionsSectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 12,
-  },
-  optionsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  optionButton: {
-    flex: 0.48,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  optionButtonText: {
-    fontSize: 14,
-    fontWeight: '500',
   },
   suggestionsContainer: {
     position: 'absolute',

@@ -2,6 +2,7 @@ import React, { ReactNode, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { CaretDown, CaretUp } from 'phosphor-react-native';
 import { useTheme } from '../contexts/ThemeContext';
+import { uiPrimitives } from '../styles/uiPrimitives';
 
 interface CollapsibleSectionProps {
   title: string;
@@ -21,7 +22,9 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
   const Icon = expanded ? CaretUp : CaretDown;
 
   return (
-    <View style={[styles.section, { backgroundColor: colors.surface }]}>
+    <View
+      style={[uiPrimitives.subtleSection, styles.section, { backgroundColor: colors.surface }]}
+    >
       <TouchableOpacity
         accessibilityRole="button"
         accessibilityState={{ expanded }}
@@ -40,15 +43,7 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
 };
 
 const styles = StyleSheet.create({
-  section: {
-    borderRadius: 12,
-    elevation: 2,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-  },
+  section: {},
   header: {
     alignItems: 'center',
     borderBottomWidth: 1,

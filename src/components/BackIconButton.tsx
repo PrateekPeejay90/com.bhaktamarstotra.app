@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleProp, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
 import { ArrowLeft } from 'phosphor-react-native';
 import { useTheme } from '../contexts/ThemeContext';
+import { componentRecipes } from '../styles/componentRecipes';
 
 interface BackIconButtonProps {
   onPress: () => void;
@@ -22,6 +23,7 @@ export const BackIconButton: React.FC<BackIconButtonProps> = ({
       accessibilityRole="button"
       onPress={onPress}
       style={[
+        componentRecipes.squareHeaderIconButton,
         styles.button,
         {
           backgroundColor: variant === 'surfaceVariant' ? colors.surfaceVariant : colors.surface,
@@ -36,12 +38,5 @@ export const BackIconButton: React.FC<BackIconButtonProps> = ({
 };
 
 const styles = StyleSheet.create({
-  button: {
-    alignItems: 'center',
-    borderRadius: 12,
-    borderWidth: 1,
-    height: 42,
-    justifyContent: 'center',
-    width: 42,
-  },
+  button: {},
 });

@@ -13,12 +13,15 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { useFontSize } from '../contexts/FontSizeContext';
 import { SearchResult } from '../services/searchService';
 import { Verse } from '../types';
+import { uiPrimitives } from '../styles/uiPrimitives';
 
 interface SearchResultsProps {
   results: SearchResult[];
   onVerseSelect: (verse: Verse) => void;
   searchTerm: string;
   loading?: boolean;
+  embedded?: boolean;
+  actionHint?: string;
 }
 
 interface HighlightedTextProps {
@@ -64,11 +67,14 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
   results,
   onVerseSelect,
   searchTerm,
-  loading = false
+  loading = false,
+  embedded = false,
+  actionHint,
 }) => {
   const { colors } = useTheme();
   const { t } = useLanguage();
   const { fontSizes, scaleFontSize } = useFontSize();
+  const tapHint = actionHint ?? t.search.tapToView;
 
   const getFieldDisplayName = (fieldName: string): string => {
     switch (fieldName) {
@@ -81,12 +87,17 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
     }
   };
 
-  const renderSearchResult = ({ item }: { item: SearchResult }) => {
-    const { verse, matchedFields, relevanceScore } = item;
+  const renderSearchResultCard = (item: SearchResult) => {
+    const { verse, matchedFields } = item;
 
     return (
       <TouchableOpacity
-        style={[styles.resultCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
+        key={`search-${verse.verse_number}`}
+        style={[
+          uiPrimitives.elevatedCard,
+          styles.resultCard,
+          { backgroundColor: colors.surface, borderColor: colors.border },
+        ]}
         onPress={() => onVerseSelect(verse)}
       >
         {/* Verse Header */}
@@ -94,26 +105,23 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
           <Text style={[styles.verseNumber, { color: colors.spiritual, fontSize: scaleFontSize(16) }]}>
             {t.verseDetail.verse} {verse.verse_number}
           </Text>
-          <View style={styles.relevanceContainer}>
-            <Text style={[styles.relevanceScore, { color: colors.textSecondary, fontSize: scaleFontSize(12) }]}>
-              {Math.round(relevanceScore)}% {t.search.match}
-            </Text>
-          </View>
         </View>
 
         {/* Matched Fields Indicators */}
-        <View style={styles.matchedFieldsContainer}>
-          {matchedFields.map((field, index) => (
-            <View
-              key={index}
-              style={[styles.fieldTag, { backgroundColor: colors.accent, borderColor: colors.spiritual }]}
-            >
-              <Text style={[styles.fieldTagText, { color: colors.spiritual, fontSize: scaleFontSize(11) }]}>
-                {getFieldDisplayName(field)}
-              </Text>
-            </View>
-          ))}
-        </View>
+        {!embedded ? (
+          <View style={styles.matchedFieldsContainer}>
+            {matchedFields.map((field, index) => (
+              <View
+                key={index}
+                style={[styles.fieldTag, { backgroundColor: colors.accent, borderColor: colors.spiritual }]}
+              >
+                <Text style={[styles.fieldTagText, { color: colors.spiritual, fontSize: scaleFontSize(11) }]}>
+                  {getFieldDisplayName(field)}
+                </Text>
+              </View>
+            ))}
+          </View>
+        ) : null}
 
         {/* Sanskrit Text (always show) */}
         {verse.content && (
@@ -168,7 +176,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
 
         {/* Tap to view indicator */}
         <Text style={[styles.tapToView, { color: colors.textSecondary, fontSize: scaleFontSize(12) }]}>
-          {t.search.tapToView}
+          {tapHint}
         </Text>
       </TouchableOpacity>
     );
@@ -176,7 +184,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
+      <View style={[styles.loadingContainer, embedded && styles.embeddedStateContainer]}>
         <Text style={[styles.loadingText, { color: colors.text, fontSize: scaleFontSize(16) }]}>{t.search.searching}</Text>
       </View>
     );
@@ -184,7 +192,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
 
   if (results.length === 0) {
     return (
-      <View style={styles.emptyContainer}>
+      <View style={[styles.emptyContainer, embedded && styles.embeddedStateContainer]}>
         <Text style={[styles.emptyTitle, { color: colors.text, fontSize: scaleFontSize(18) }]}>{t.search.noResults}</Text>
         <Text style={[styles.emptySubtitle, { color: colors.textSecondary, fontSize: scaleFontSize(14), lineHeight: scaleFontSize(14) * 1.45 }]}>
           {t.search.tip4}
@@ -194,7 +202,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, embedded && styles.embeddedContainer]}>
       <View style={styles.resultsHeader}>
         <Text style={[styles.resultsCount, { color: colors.text, fontSize: scaleFontSize(16) }]}>
           {results.length} {results.length === 1 ? t.verseList.verse : t.verseList.verses} {t.verseList.versesFound}
@@ -204,13 +212,19 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
         </Text>
       </View>
 
-      <FlatList
-        data={results}
-        keyExtractor={(item) => `search-${item.verse.verse_number}`}
-        renderItem={renderSearchResult}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.resultsList}
-      />
+      {embedded ? (
+        <View style={styles.resultsList}>
+          {results.map(renderSearchResultCard)}
+        </View>
+      ) : (
+        <FlatList
+          data={results}
+          keyExtractor={(item) => `search-${item.verse.verse_number}`}
+          renderItem={({ item }) => renderSearchResultCard(item)}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.resultsList}
+        />
+      )}
     </View>
   );
 };
@@ -219,11 +233,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  embeddedContainer: {
+    flex: 0,
+  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 40,
+  },
+  embeddedStateContainer: {
+    flex: 0,
+    paddingVertical: 20,
   },
   loadingText: {
     fontSize: 16,
@@ -264,13 +285,7 @@ const styles = StyleSheet.create({
   resultCard: {
     padding: 16,
     marginBottom: 12,
-    borderRadius: 12,
     borderWidth: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   resultHeader: {
     flexDirection: 'row',
@@ -281,15 +296,6 @@ const styles = StyleSheet.create({
   verseNumber: {
     fontSize: 16,
     fontWeight: '700',
-  },
-  relevanceContainer: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  relevanceScore: {
-    fontSize: 12,
-    fontWeight: '500',
   },
   matchedFieldsContainer: {
     flexDirection: 'row',

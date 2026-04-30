@@ -1,0 +1,133 @@
+import { StyleSheet } from 'react-native';
+
+export const componentRecipes = StyleSheet.create({
+  squareHeaderIconButton: {
+    alignItems: 'center',
+    borderRadius: 12,
+    borderWidth: 1,
+    height: 42,
+    justifyContent: 'center',
+    width: 42,
+  },
+  compactOutlineIconButton: {
+    alignItems: 'center',
+    borderRadius: 10,
+    borderWidth: 1,
+    justifyContent: 'center',
+    padding: 8,
+  },
+  actionButton: {
+    alignItems: 'center',
+    borderRadius: 10,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+  },
+  outlineActionButton: {
+    borderWidth: 2,
+  },
+  subtleActionButton: {
+    borderWidth: 1,
+  },
+  buttonLabelBold: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  buttonLabelSemibold: {
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  surfaceTextInput: {
+    borderRadius: 12,
+    borderWidth: 1,
+    fontSize: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  inlineActionButton: {
+    alignItems: 'center',
+    borderRadius: 10,
+    flexDirection: 'row',
+    gap: 6,
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  listRowCard: {
+    borderBottomWidth: 1,
+    padding: 8,
+  },
+  drawerPanel: {
+    shadowColor: '#000',
+    shadowOffset: { width: 4, height: 0 },
+    shadowOpacity: 0.15,
+    shadowRadius: 14,
+    elevation: 24,
+  },
+  drawerSection: {
+    borderBottomWidth: 1,
+    padding: 16,
+  },
+  drawerSectionTight: {
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+  },
+  drawerSectionTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 0.8,
+    marginBottom: 2,
+    textTransform: 'uppercase',
+  },
+  drawerRowButton: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  drawerSplitRowButton: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  selectionOptionButton: {
+    alignItems: 'center',
+    borderRadius: 10,
+    borderWidth: 2,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 16,
+  },
+  selectionOptionLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  selectionOptionSubLabel: {
+    fontSize: 12,
+    fontWeight: '400',
+  },
+  previewPanel: {
+    alignItems: 'center',
+    borderRadius: 12,
+    borderWidth: 1,
+    padding: 16,
+  },
+  controlButton: {
+    alignItems: 'center',
+    borderRadius: 10,
+    borderWidth: 1,
+    elevation: 2,
+    flex: 1,
+    flexDirection: 'row',
+    gap: 8,
+    justifyContent: 'center',
+    padding: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+});

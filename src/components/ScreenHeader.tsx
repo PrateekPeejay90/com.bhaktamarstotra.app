@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { List } from 'phosphor-react-native';
 import { useTheme } from '../contexts/ThemeContext';
+import { componentRecipes } from '../styles/componentRecipes';
 import { BackIconButton } from './BackIconButton';
 
 interface ScreenHeaderProps {
@@ -58,7 +59,11 @@ export const ScreenHeader: React.FC<ScreenHeaderProps> = ({
 
       <View style={[styles.sideSlot, styles.sideSlotRight]}>
         <TouchableOpacity
-          style={[styles.menuButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
+          style={[
+            componentRecipes.squareHeaderIconButton,
+            styles.menuButton,
+            { backgroundColor: colors.surface, borderColor: colors.border },
+          ]}
           onPress={onOpenDrawer}
         >
           <List size={20} color={colors.spiritual} weight="bold" />
@@ -98,12 +103,5 @@ const styles = StyleSheet.create({
     marginTop: 2,
     textAlign: 'center',
   },
-  menuButton: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 12,
-    borderWidth: 1,
-    height: 42,
-    width: 42,
-  },
+  menuButton: {},
 });
