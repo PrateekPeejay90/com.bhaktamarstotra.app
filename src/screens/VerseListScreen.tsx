@@ -8,7 +8,7 @@ import {
   TextInput,
   SafeAreaView,
 } from "react-native";
-import { ArrowRight } from "phosphor-react-native";
+import { ArrowRight, UserSoundIcon } from "phosphor-react-native";
 import { dataService } from "../services/dataService";
 import { searchService } from "../services/searchService";
 import { Verse } from "../types";
@@ -17,6 +17,7 @@ import { useLanguage } from "../contexts/LanguageContext";
 import { useFontSize } from "../contexts/FontSizeContext";
 import { ScreenHeader } from "../components/ScreenHeader";
 import { componentRecipes } from "../styles/componentRecipes";
+import { useTextToSpeech } from "../hooks/useTextToSpeech";
 
 interface VerseListScreenProps {
   onVerseSelect: (verse: Verse) => void;
@@ -35,6 +36,13 @@ export const VerseListScreen: React.FC<VerseListScreenProps> = ({
   const [verses, setVerses] = useState<Verse[]>([]);
   const [filteredVerses, setFilteredVerses] = useState<Verse[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const { speak } = useTextToSpeech();
+
+  const handleReadVerse = (verse: Verse) => {
+    const announcement = `${t.verseDetail.verse} ${verse.verse_number}. ${t.verseList.readAloud}`;
+    speak(verse.content, announcement, 0.35);
+  };
+
   const directVerseMatch = searchQuery
     .trim()
     .match(/^(?:verse|shlok|श्लोक)?\s*(\d{1,2})$/i);
@@ -71,9 +79,8 @@ export const VerseListScreen: React.FC<VerseListScreenProps> = ({
   };
 
   const renderVerseItem = ({ item }: { item: Verse }) => (
-    <TouchableOpacity
+    <View
       style={[styles.verseItem, { backgroundColor: colors.surface, borderColor: colors.border }]}
-      onPress={() => onVerseSelect(item)}
     >
       <View style={styles.verseHeader}>
         <Text
@@ -84,22 +91,38 @@ export const VerseListScreen: React.FC<VerseListScreenProps> = ({
         >
           {t.verseDetail.verse} {item.verse_number}
         </Text>
+
+        <TouchableOpacity
+          style={[componentRecipes.inlineActionButton, styles.readButton, { borderColor: colors.border }]}
+          onPress={() => handleReadVerse(item)}
+          accessibilityRole="button"
+          accessibilityLabel={`${t.verseList.readAloud} ${t.verseDetail.verse} ${item.verse_number}`}
+          accessibilityHint="Reads this verse in Sanskrit aloud"
+        >
+          <UserSoundIcon size={20} color={colors.spiritual} />
+        </TouchableOpacity>
       </View>
 
-      <Text
-        style={[
-          styles.sanskritPreview,
-          {
-            color: colors.text,
-            fontSize: fontSizes.sanskrit,
-            lineHeight: fontSizes.sanskrit * 1.5,
-          },
-        ]}
-        numberOfLines={2}
+      <TouchableOpacity
+        style={styles.verseContentButton}
+        onPress={() => onVerseSelect(item)}
+        accessibilityRole="button"
       >
-        {item.content}
-      </Text>
-    </TouchableOpacity>
+        <Text
+          style={[
+            styles.sanskritPreview,
+            {
+              color: colors.text,
+              fontSize: fontSizes.sanskrit,
+              lineHeight: fontSizes.sanskrit * 1.5,
+            },
+          ]}
+          numberOfLines={2}
+        >
+          {item.content}
+        </Text>
+      </TouchableOpacity>
+    </View>
   );
 
   return (
@@ -192,6 +215,18 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 12,
+  },
+  verseContentButton: {
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  readButton: {
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+  },
+  readButtonText: {
+    fontWeight: '700',
   },
   verseNumber: {
     fontSize: 16,

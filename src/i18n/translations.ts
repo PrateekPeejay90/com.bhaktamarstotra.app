@@ -21,6 +21,7 @@ export interface Translations {
     title: string;
     searchPlaceholder: string;
     goToVerse: string;
+    readAloud: string;
     versesFound: string;
     verse: string;
     verses: string;
@@ -34,6 +35,7 @@ export interface Translations {
     hindiMeaning: string;
     english: string;
     englishMeaning: string;
+    readAloud: string;
   };
   samputt: {
     title: string;
@@ -133,6 +135,7 @@ export const translations: Record<LanguageCode, Translations> = {
       title: 'All Verses',
       searchPlaceholder: 'Search or enter verse number...',
       goToVerse: 'Go to Verse',
+      readAloud: 'Read Verse',
       versesFound: 'found',
       verse: 'verse',
       verses: 'verses',
@@ -146,6 +149,7 @@ export const translations: Record<LanguageCode, Translations> = {
       hindiMeaning: 'Hindi Meaning',
       english: 'English',
       englishMeaning: 'English Meaning',
+      readAloud: 'Read Verse Aloud',
     },
     samputt: {
       title: 'Samputt Reading',
@@ -243,6 +247,7 @@ export const translations: Record<LanguageCode, Translations> = {
       title: 'सभी श्लोक',
       searchPlaceholder: 'खोजें या श्लोक संख्या दर्ज करें...',
       goToVerse: 'श्लोक पर जाएं',
+      readAloud: 'श्लोक पढ़ें',
       versesFound: 'मिले',
       verse: 'श्लोक',
       verses: 'श्लोक',
@@ -256,6 +261,7 @@ export const translations: Record<LanguageCode, Translations> = {
       hindiMeaning: 'हिंदी अर्थ',
       english: 'अंग्रेज़ी',
       englishMeaning: 'अंग्रेज़ी अर्थ',
+      readAloud: 'श्लोक को पढ़ें',
     },
     samputt: {
       title: 'संपुट पाठ',

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text, ScrollView, SafeAreaView } from 'react-native';
+import { View, StyleSheet, Text, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
+import { UserSoundIcon } from 'phosphor-react-native';
 import { dataService } from '../services/dataService';
 import { Verse } from '../types';
 import { useFontSize } from '../contexts/FontSizeContext';
@@ -9,6 +10,8 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { ScreenHeader } from '../components/ScreenHeader';
 import { CollapsibleSection } from '../components/CollapsibleSection';
 import { BottomNavigationBar } from '../components/BottomNavigationBar';
+import { componentRecipes } from '../styles/componentRecipes';
+import { useTextToSpeech } from '../hooks/useTextToSpeech';
 
 interface VerseDetailScreenProps {
   verse: Verse;
@@ -33,10 +36,16 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
   const totalVerses = dataService.getTotalVerses();
   const canGoPrevious = currentVerse.verse_number! > 1;
   const canGoNext = currentVerse.verse_number! < totalVerses;
+  const { speak } = useTextToSpeech();
 
   useEffect(() => {
     setCurrentVerse(verse);
   }, [verse]);
+
+  const handleReadVerse = (verseToRead: Verse) => {
+    const announcement = `${t.verseDetail.verse} ${verseToRead.verse_number}. ${t.verseDetail.readAloud}`;
+    speak(verseToRead.content, announcement, 0.35);
+  };
 
   const navigateToVerse = (direction: 'previous' | 'next') => {
     const currentVerseNumber = currentVerse.verse_number!;
@@ -93,23 +102,32 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
             nestedScrollEnabled
           >
             <View style={[styles.verseContent, { backgroundColor: colors.surface }]}>
-              <View>
-                {currentVerse.content.split('\n').map((line, index) => (
-                  <Text
-                    key={index}
-                    style={[
-                      styles.sanskritText,
-                      {
-                        fontSize: fontSizes.sanskrit,
-                        lineHeight: fontSizes.sanskrit * 1.5,
-                        color: colors.text,
-                      },
-                    ]}
-                  >
-                    {line}
-                  </Text>
-                ))}
+              <View style={styles.readButtonWrapper}>
+                <TouchableOpacity
+                  style={[componentRecipes.inlineActionButton, styles.readButton, { borderColor: colors.border }]}
+                  onPress={() => handleReadVerse(currentVerse)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`${t.verseDetail.readAloud} ${t.verseDetail.verse} ${currentVerse.verse_number}`}
+                  accessibilityHint="Reads the Sanskrit verse aloud"
+                >
+                  <UserSoundIcon size={22} color={colors.spiritual} />
+                </TouchableOpacity>
               </View>
+              {currentVerse.content.split('\n').map((line, index) => (
+                <Text
+                  key={index}
+                  style={[
+                    styles.sanskritText,
+                    {
+                      fontSize: fontSizes.sanskrit,
+                      lineHeight: fontSizes.sanskrit * 1.5,
+                      color: colors.text,
+                    },
+                  ]}
+                >
+                  {line}
+                </Text>
+              ))}
             </View>
 
             <View style={styles.translationsContainer}>
@@ -217,6 +235,18 @@ const styles = StyleSheet.create({
     lineHeight: 28,
     fontFamily: 'serif',
     textAlign: 'center',
+  },
+  readButtonWrapper: {
+    alignItems: 'flex-end',
+    marginBottom: 12,
+  },
+  readButton: {
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  readButtonText: {
+    fontWeight: '700',
   },
   transliterationText: {
     fontSize: 16,
