@@ -4,9 +4,11 @@ import {
   StyleSheet,
   Text,
   ScrollView,
-  SafeAreaView
+  SafeAreaView,
+  TouchableOpacity,
 } from 'react-native';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
+import { UserSoundIcon } from 'phosphor-react-native';
 import { dataService } from '../services/dataService';
 import { Verse } from '../types';
 import { useFontSize } from '../contexts/FontSizeContext';
@@ -15,6 +17,8 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { ScreenHeader } from '../components/ScreenHeader';
 import { CollapsibleSection } from '../components/CollapsibleSection';
 import { BottomNavigationBar } from '../components/BottomNavigationBar';
+import { componentRecipes } from '../styles/componentRecipes';
+import { useTextToSpeech } from '../hooks/useTextToSpeech';
 
 interface SamputReadingScreenProps {
   samputVerseNumber: number;
@@ -115,6 +119,13 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
     }
   };
 
+  const { speak } = useTextToSpeech();
+
+  const handleReadVerse = (verseToRead: Verse) => {
+    const announcement = `${t.verseDetail.verse} ${verseToRead.verse_number}. ${t.verseDetail.readAloud}`;
+    speak(verseToRead.content, announcement, 0.35);
+  };
+
   const getVerseTypeLabel = () => {
     if (!currentItem) return '';
     return currentItem.isSamputVerse 
@@ -164,6 +175,36 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
               ]}
             >
               <View style={[styles.sanskritContainer, { borderBottomColor: colors.border }]}>
+                {currentItem.verse.verse_heading ? (
+                  <View style={styles.verseHeadingWrapper}>
+                    <View style={styles.verseHeadingRow}>
+                      <View style={styles.verseHeadingCenterWrapper}>
+                        <Text
+                          style={[
+                            styles.verseHeadingText,
+                            {
+                              fontSize: fontSizes.sanskrit,
+                              color: colors.spiritual,
+                            },
+                          ]}
+                        >
+                          || {currentItem.verse.verse_heading} ||
+                        </Text>
+                      </View>
+                      <View style={styles.readButtonWrapper}>
+                        <TouchableOpacity
+                          style={[componentRecipes.inlineActionButton, styles.readButton, { borderColor: colors.border }]}
+                          onPress={() => handleReadVerse(currentItem.verse)}
+                          accessibilityRole="button"
+                          accessibilityLabel={`${t.verseDetail.readAloud} ${t.verseDetail.verse} ${currentItem.verse.verse_number}`}
+                          accessibilityHint="Reads the Sanskrit verse aloud"
+                        >
+                          <UserSoundIcon size={22} color={colors.spiritual} />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  </View>
+                ) : null}
                 {currentItem.verse.content.split('\n').map((line, index) => (
                   <Text
                     key={index}
@@ -178,12 +219,26 @@ export const SamputReadingScreen: React.FC<SamputReadingScreenProps> = ({
                   >
                     {line}
                   </Text>
-                  ))}
+                ))}
               </View>
             </View>
 
             <View style={styles.collapsibleSections}>
               <CollapsibleSection title={t.verseDetail.transliteration} titleFontSize={fontSizes.labels}>
+                {currentItem.verse.verse_heading_english ? (
+                  <Text
+                    style={[
+                      styles.headingEnglishText,
+                      {
+                        fontSize: fontSizes.transliteration,
+                        lineHeight: fontSizes.transliteration * 1.5,
+                        color: colors.textSecondary,
+                      },
+                    ]}
+                  >
+                    {currentItem.verse.verse_heading_english}
+                  </Text>
+                ) : null}
                 {currentItem.verse.transliteration.split('\n').map((line, index) => (
                   <Text
                     key={index}
@@ -324,6 +379,44 @@ const styles = StyleSheet.create({
   englishText: {
     color: '#444444',
     textAlign: 'justify',
+  },
+  verseHeadingWrapper: {
+    marginBottom: 14,
+  },
+  verseHeadingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    position: 'relative',
+    marginBottom: 10,
+  },
+  verseHeadingCenterWrapper: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+  },
+  readButtonWrapper: {
+    alignItems: 'flex-end',
+  },
+  readButton: {
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  verseHeadingText: {
+    fontFamily: 'serif',
+    textAlign: 'center',
+    marginBottom: 0,
+  },
+  verseHeadingEnglishText: {
+    textAlign: 'center',
+    fontStyle: 'italic',
+  },
+  headingEnglishText: {
+    fontStyle: 'italic',
+    textAlign: 'center',
+    marginBottom: 10,
   },
   progressText: {
     fontSize: 14,

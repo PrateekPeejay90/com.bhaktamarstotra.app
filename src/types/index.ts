@@ -5,6 +5,8 @@ export interface Verse {
   transliteration: string;
   hindi_meaning: string;
   english_meaning: string;
+  verse_heading?: string;
+  verse_heading_english?: string;
   verse_number: number | null;
 }
 

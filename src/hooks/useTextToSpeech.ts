@@ -19,23 +19,30 @@ export const useTextToSpeech = () => {
 
     init();
 
-    const startListener = Tts.addEventListener('tts-start', () => {
-      setIsSpeaking(true);
-    });
+    const hasTtsEvents = Boolean(Tts && typeof Tts.addEventListener === 'function');
+    let startListener: any;
+    let finishListener: any;
+    let cancelListener: any;
 
-    const finishListener = Tts.addEventListener('tts-finish', () => {
-      setIsSpeaking(false);
-    });
+    if (hasTtsEvents) {
+      startListener = Tts.addEventListener('tts-start', () => {
+        setIsSpeaking(true);
+      });
 
-    const cancelListener = Tts.addEventListener('tts-cancel', () => {
-      setIsSpeaking(false);
-    });
+      finishListener = Tts.addEventListener('tts-finish', () => {
+        setIsSpeaking(false);
+      });
+
+      cancelListener = Tts.addEventListener('tts-cancel', () => {
+        setIsSpeaking(false);
+      });
+    }
 
     return () => {
       isMounted = false;
-      startListener.remove();
-      finishListener.remove();
-      cancelListener.remove();
+      startListener?.remove?.();
+      finishListener?.remove?.();
+      cancelListener?.remove?.();
     };
   }, []);
 

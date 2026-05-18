@@ -13,14 +13,24 @@ const FALLBACK_LANGUAGES = Platform.select({
 
 class TtsService {
   private initialized = false;
+  private enabled = Boolean(Tts && typeof Tts.setDefaultRate === 'function');
 
   async init(): Promise<void> {
     if (this.initialized) {
       return;
     }
 
-    Tts.setDefaultRate(DEFAULT_RATE);
-    Tts.setDefaultPitch(DEFAULT_PITCH);
+    if (!this.enabled) {
+      this.initialized = true;
+      return;
+    }
+
+    try {
+      Tts.setDefaultRate(DEFAULT_RATE);
+      Tts.setDefaultPitch(DEFAULT_PITCH);
+    } catch (error) {
+      // ignore if native module is not fully available yet
+    }
 
     const languages = [PRIMARY_LANGUAGE, ...FALLBACK_LANGUAGES];
 
@@ -43,18 +53,33 @@ class TtsService {
     }
 
     await this.init();
-    if (rate !== undefined) {
-      Tts.setDefaultRate(rate);
-    } else {
-      Tts.setDefaultRate(DEFAULT_RATE);
+    if (!this.enabled) {
+      return;
     }
 
-    Tts.stop();
-    Tts.speak(text);
+    try {
+      if (rate !== undefined) {
+        Tts.setDefaultRate(rate);
+      } else {
+        Tts.setDefaultRate(DEFAULT_RATE);
+      }
+      Tts.stop();
+      Tts.speak(text);
+    } catch (error) {
+      // gracefully ignore TTS errors
+    }
   }
 
   stop(): void {
-    Tts.stop();
+    if (!this.enabled) {
+      return;
+    }
+
+    try {
+      Tts.stop();
+    } catch (error) {
+      // ignore stop errors when module is unavailable
+    }
   }
 }
 

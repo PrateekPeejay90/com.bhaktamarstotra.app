@@ -20,14 +20,14 @@ interface VerseDetailScreenProps {
   onOpenDrawer: () => void;
 }
 
-export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({ 
-  verse, 
-  onBack, 
+export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
+  verse,
+  onBack,
   onVerseChange,
-  onOpenDrawer 
+  onOpenDrawer
 }) => {
   const [currentVerse, setCurrentVerse] = useState<Verse>(verse);
-  
+
   // Use font size context and theme
   const { fontSizes, scaleFontSize } = useFontSize();
   const { colors } = useTheme();
@@ -49,10 +49,10 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
 
   const navigateToVerse = (direction: 'previous' | 'next') => {
     const currentVerseNumber = currentVerse.verse_number!;
-    const targetVerseNumber = direction === 'previous' 
-      ? currentVerseNumber - 1 
+    const targetVerseNumber = direction === 'previous'
+      ? currentVerseNumber - 1
       : currentVerseNumber + 1;
-    
+
     const targetVerse = dataService.getVerseByNumber(targetVerseNumber);
     if (targetVerse) {
       setCurrentVerse(targetVerse);
@@ -63,10 +63,10 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
   // Swipe gesture handler
   const onSwipeGesture = (event: any) => {
     const { translationX, state } = event.nativeEvent;
-    
+
     if (state === State.END) {
       const swipeThreshold = 50; // Minimum distance for swipe
-      
+
       if (translationX > swipeThreshold && canGoPrevious) {
         // Swipe right - go to previous verse
         navigateToVerse('previous');
@@ -81,7 +81,7 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <ScreenHeader
         title={`${t.verseDetail.verse} ${currentVerse.verse_number}`}
-        subtitle={`${t.verseDetail.page} ${currentVerse.page_number}`}
+        // subtitle={`${t.verseDetail.page} ${currentVerse.page_number}`}
         onBack={onBack}
         onOpenDrawer={onOpenDrawer}
         titleFontSize={scaleFontSize(18)}
@@ -102,16 +102,31 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
             nestedScrollEnabled
           >
             <View style={[styles.verseContent, { backgroundColor: colors.surface }]}>
-              <View style={styles.readButtonWrapper}>
-                <TouchableOpacity
-                  style={[componentRecipes.inlineActionButton, styles.readButton, { borderColor: colors.border }]}
-                  onPress={() => handleReadVerse(currentVerse)}
-                  accessibilityRole="button"
-                  accessibilityLabel={`${t.verseDetail.readAloud} ${t.verseDetail.verse} ${currentVerse.verse_number}`}
-                  accessibilityHint="Reads the Sanskrit verse aloud"
-                >
-                  <UserSoundIcon size={22} color={colors.spiritual} />
-                </TouchableOpacity>
+              <View style={styles.verseHeadingRow}>
+                <View style={styles.verseHeadingCenterWrapper}>
+                  <Text
+                    style={[
+                      styles.verseHeadingText,
+                      {
+                        fontSize: fontSizes.sanskrit,
+                        color: colors.spiritual,
+                      },
+                    ]}
+                  >
+                    || {currentVerse.verse_heading} ||
+                  </Text>
+                </View>
+                <View style={styles.readButtonWrapper}>
+                  <TouchableOpacity
+                    style={[componentRecipes.inlineActionButton, styles.readButton, { borderColor: colors.border }]}
+                    onPress={() => handleReadVerse(currentVerse)}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${t.verseDetail.readAloud} ${t.verseDetail.verse} ${currentVerse.verse_number}`}
+                    accessibilityHint="Reads the Sanskrit verse aloud"
+                  >
+                    <UserSoundIcon size={22} color={colors.spiritual} />
+                  </TouchableOpacity>
+                </View>
               </View>
               {currentVerse.content.split('\n').map((line, index) => (
                 <Text
@@ -133,6 +148,20 @@ export const VerseDetailScreen: React.FC<VerseDetailScreenProps> = ({
             <View style={styles.translationsContainer}>
               <CollapsibleSection title={t.verseDetail.transliteration} titleFontSize={fontSizes.labels}>
                 <View>
+                  {currentVerse.verse_heading_english ? (
+                    <Text
+                      style={[
+                        styles.headingEnglishText,
+                        {
+                          fontSize: fontSizes.transliteration,
+                          lineHeight: fontSizes.transliteration * 1.5,
+                          color: colors.textSecondary,
+                        },
+                      ]}
+                    >
+                      {currentVerse.verse_heading_english}
+                    </Text>
+                  ) : null}
                   {currentVerse.transliteration.split('\n').map((line, index) => (
                     <Text
                       key={index}
@@ -266,6 +295,36 @@ const styles = StyleSheet.create({
     color: '#444444',
     lineHeight: 24,
     textAlign: 'justify',
+  },
+  verseHeadingWrapper: {
+    marginBottom: 14,
+  },
+  verseHeadingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    position: 'relative',
+    marginBottom: 10,
+  },
+  verseHeadingCenterWrapper: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+  },
+  verseHeadingText: {
+    fontFamily: 'serif',
+    textAlign: 'center',
+    marginBottom: 0,
+  },
+  verseHeadingEnglishText: {
+    textAlign: 'center',
+    fontStyle: 'italic',
+  },
+  headingEnglishText: {
+    fontStyle: 'italic',
+    textAlign: 'center',
+    marginBottom: 10,
   },
   translationsContainer: {
     paddingHorizontal: 12,
